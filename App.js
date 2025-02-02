@@ -131,6 +131,7 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     color: '#333',
     marginBottom: 10,
+    alignSelf: 'center',
   },
   subtitle: {
     fontSize: 18,
