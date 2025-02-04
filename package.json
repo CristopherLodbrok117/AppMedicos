@@ -1,7 +1,7 @@
 {
   "name": "appmedicos",
   "version": "1.0.0",
-  "main": "index.js",
+  "main": "expo-router/entry",
   "scripts": {
     "start": "expo start",
     "android": "expo start --android",
@@ -11,7 +11,9 @@
   "dependencies": {
     "@expo/metro-runtime": "~4.0.1",
     "@expo/vector-icons": "^14.0.4",
+    "@react-native-picker/picker": "^2.11.0",
     "expo": "~52.0.28",
+    "expo-router": "~4.0.17",
     "expo-status-bar": "~2.0.1",
     "react": "18.3.1",
     "react-dom": "18.3.1",
