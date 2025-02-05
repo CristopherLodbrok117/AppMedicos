@@ -19,7 +19,7 @@ const SideNavigationBar = () => {
         </TouchableOpacity>
       </Link>
 
-      <Link href='/' asChild>
+      <Link href='/PatientEvaluationScreen' asChild>
         <TouchableOpacity style={styles.navItem} >
           <Ionicons name="pulse" style={styles.navIcon}  />
           {/* <Ionicons name="medkit-outline" size={24} color="white" /> */}
