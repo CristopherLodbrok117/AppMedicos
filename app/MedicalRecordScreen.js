@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { View, Text, TextInput, Button, TouchableOpacity, StyleSheet, ScrollView } from 'react-native';
+import { View, Text, TextInput, Button, TouchableOpacity, StyleSheet, ScrollView, Image } from 'react-native';
 import { Picker } from '@react-native-picker/picker';
 
 export default function MedicalRecordScreen() {
@@ -10,7 +10,10 @@ export default function MedicalRecordScreen() {
     <ScrollView contentContainerStyle={styles.container}>
       <Text style={styles.title}>Expediente Médico</Text>
       {/* Imagen central (el usuario define la fuente) */}
-      <View style={styles.imagePlaceholder} />
+      <Image
+              style={styles.image}
+              source={require('./assets/doctor.png')}
+      />
       <Text style={styles.label}>Fecha: 01/02/2025</Text>
       <Text style={styles.label}>Hora: 14:30</Text>
       
@@ -121,6 +124,14 @@ const styles = StyleSheet.create({
     height: 100,
     backgroundColor: '#ccc',
     marginBottom: 10,
+  },
+  image: {
+    width: 100,
+    height: 100,
+    marginBottom: 20,
+    borderRadius: 8,
+    resizeMode: 'cover',
+    alignSelf: 'center',
   },
   label: {
     fontSize: 16,

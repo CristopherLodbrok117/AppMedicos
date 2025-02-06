@@ -1,8 +1,8 @@
 import React, { useState } from 'react';
-import { View, Text, TextInput, Button, TouchableOpacity, StyleSheet, ScrollView } from 'react-native';
+import { View, Text, TextInput, Button, TouchableOpacity, StyleSheet, ScrollView, Image } from 'react-native';
 import { Picker } from '@react-native-picker/picker';
 
-// import icon from './assets/doctor.png';
+// import doctorImage from './assets/doctor.png';
 
 const PatientEvaluationScreen = () => {
   // const [showArea, setShowArea] = useState(false);
@@ -13,11 +13,11 @@ const PatientEvaluationScreen = () => {
     <ScrollView contentContainerStyle={styles.container}>
       <Text style={styles.title}>Expediente Médico</Text>
       {/* Imagen central (el usuario define la fuente) */}
-      <View style={styles.imagePlaceholder} />
-      {/* <Image
+      {/* <View style={styles.imagePlaceholder} /> */}
+      <Image
         style={styles.image}
-        source={require('./assets/favicon.png')}
-      /> */}
+        source={require('./assets/doctor.png')}
+      />
 
 
 

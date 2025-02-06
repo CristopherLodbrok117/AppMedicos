@@ -21,7 +21,7 @@ const PatientTransferScreen = () => {
         {/* Imagen */}
         <Image
           style={styles.image}
-          source={icon}
+          source={require('./assets/doctor.png')}
         />
 
         {/* Disclaimer */}
