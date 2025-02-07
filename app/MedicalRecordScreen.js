@@ -1,10 +1,21 @@
 import React, { useState } from 'react';
 import { View, Text, TextInput, Button, TouchableOpacity, StyleSheet, ScrollView, Image } from 'react-native';
 import { Picker } from '@react-native-picker/picker';
+import FloatingLabelInput from './components/FloatingLabelInput';
 
 export default function MedicalRecordScreen() {
   const [showArea, setShowArea] = useState(false);
   const [vehicleType, setVehicleType] = useState('');
+
+  const [vehicleNum, setVehicleNum] = useState('');
+  const [affiliation, setAffiliation] = useState('');
+  const [age, setAge] = useState('');
+  const [address, setAddress] = useState('');
+  const [colony, setColony] = useState('');
+  const [municipality, setMunicipality] = useState('');
+  const [phone, setPhone] = useState('');
+  const [rightful, setRightful] = useState('');
+  
 
   return (
     <ScrollView contentContainerStyle={styles.container}>
@@ -14,8 +25,8 @@ export default function MedicalRecordScreen() {
               style={styles.image}
               source={require('./assets/doctor.png')}
       />
-      <Text style={styles.label}>Fecha: 01/02/2025</Text>
-      <Text style={styles.label}>Hora: 14:30</Text>
+      <Text style={styles.dateLabel}>Fecha: 01/02/2025</Text>
+      <Text style={styles.dateLabel}>Hora: 14:30</Text>
       
       <TouchableOpacity style={styles.expandButton} onPress={() => setShowArea(!showArea)}>
         <Text style={styles.buttonText}>{showArea ? 'Ocultar calendario' : 'Mostrar calendario'}</Text>
@@ -58,8 +69,9 @@ export default function MedicalRecordScreen() {
         <TextInput style={styles.input} placeholder="Especificar otro" />
       )}
       
-      <Text style={styles.label}>Número de vehículo</Text>
-      <TextInput style={styles.input} placeholder="Número de vehículo" />
+      {/* <Text style={styles.label}>Número de vehículo</Text>
+      <TextInput style={styles.input} placeholder="Número de vehículo" /> */}
+      <FloatingLabelInput label="Número de vehículo" iconName="directions-car" value={vehicleNum} onChangeText={setVehicleNum} />
       
       <Text style={styles.label}>Operador</Text>
       <Picker style={styles.picker}>
@@ -74,8 +86,9 @@ export default function MedicalRecordScreen() {
         <Picker.Item label="Louise" value="Louise" />
       </Picker>
       
-      <Text style={styles.label}>Nombre o media filiación</Text>
-      <TextInput style={styles.input} placeholder="Nombre o media filiación" />
+      {/* <Text style={styles.label}>Nombre o media filiación</Text>
+      <TextInput style={styles.input} placeholder="Nombre o media filiación" /> */}
+      <FloatingLabelInput label="Nombre o media filiación" iconName="face" value={affiliation} onChangeText={setAffiliation} />
       
       <Text style={styles.label}>Género</Text>
       <Picker style={styles.picker}>
@@ -83,23 +96,29 @@ export default function MedicalRecordScreen() {
         <Picker.Item label="Femenino" value="Femenino" />
       </Picker>
       
-      <Text style={styles.label}>Edad</Text>
-      <TextInput style={styles.input} placeholder="Ej. 18" keyboardType="numeric" />
+      {/* <Text style={styles.label}>Edad</Text>
+      <TextInput style={styles.input} placeholder="Ej. 18" keyboardType="numeric" /> */}
+      <FloatingLabelInput label="Edad" iconName="person" value={age} onChangeText={setAge} />
       
-      <Text style={styles.label}>Domicilio</Text>
-      <TextInput style={styles.input} placeholder="Ej. Blvd. Gral. Marcelino García Barragán #1421" />
+      {/* <Text style={styles.label}>Domicilio</Text>
+      <TextInput style={styles.input} placeholder="Ej. Blvd. Gral. Marcelino García Barragán #1421" /> */}
+      <FloatingLabelInput label="Domicilio" iconName="home" value={address} onChangeText={setAddress} />
       
-      <Text style={styles.label}>Colonia</Text>
-      <TextInput style={styles.input} placeholder="Ej. Olímpica" />
+      {/* <Text style={styles.label}>Colonia</Text>
+      <TextInput style={styles.input} placeholder="Ej. Olímpica" /> */}
+      <FloatingLabelInput label="Colonia" iconName="location-city" value={colony} onChangeText={setColony} />
 
-      <Text style={styles.label}>Municipio</Text>
-      <TextInput style={styles.input} placeholder="Ej. Guadalajara" />
+      {/* <Text style={styles.label}>Municipio</Text>
+      <TextInput style={styles.input} placeholder="Ej. Guadalajara" /> */}
+      <FloatingLabelInput label="Municipio" iconName="location-city" value={municipality} onChangeText={setMunicipality} />
 
-      <Text style={styles.label}>Municipio</Text>
-      <TextInput style={styles.input} placeholder="Ej. 320541898" />
+      {/* <Text style={styles.label}>Telefono</Text>
+      <TextInput style={styles.input} placeholder="Ej. 320541898" /> */}
+      <FloatingLabelInput label="Teléfono" iconName="phone-android" value={phone} onChangeText={setPhone} />
 
-      <Text style={styles.label}>Derechohabiente a</Text>
-      <TextInput style={styles.input} placeholder="Ej. nombre de conyugue, hijo, etc." />
+      {/* <Text style={styles.label}>Derechohabiente a</Text>
+      <TextInput style={styles.input} placeholder="Ej. nombre de conyugue, hijo, etc." /> */}
+      <FloatingLabelInput label="Derechohabiente a" iconName="person-add-alt" value={rightful} onChangeText={setRightful} />
       
       <TouchableOpacity style={styles.saveButton}>
         <Text style={styles.buttonText}>Guardar</Text>
@@ -135,10 +154,18 @@ const styles = StyleSheet.create({
   },
   label: {
     fontSize: 16,
-    color: '#666',
+    color: '#03826f',
     marginTop: 20,
     marginBottom: 5,
     alignSelf: 'flex-start',
+  },
+  dateLabel: {
+    fontSize: 16,
+    color: '#03826f',
+    marginTop: 5,
+    marginBottom: 5,
+    alignSelf: 'flex-start',
+    fontWeight: 'bold',
   },
   picker: {
     width: '100%',
