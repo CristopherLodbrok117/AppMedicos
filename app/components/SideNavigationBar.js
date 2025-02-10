@@ -29,7 +29,7 @@ const SideNavigationBar = () => {
       </Link>
       
 
-      <Link href='/' asChild>
+      <Link href='/FirstEvaluationScreen' asChild>
         <TouchableOpacity style={styles.navItem} >
           <Ionicons name="newspaper-sharp" style={styles.navIcon} />
           {/* <Text style={styles.navText}>Perfil</Text> */}
