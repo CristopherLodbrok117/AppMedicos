@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { View, Text, TextInput, Button, TouchableOpacity, StyleSheet, ScrollView, Image } from 'react-native';
 import { Picker } from '@react-native-picker/picker';
+import DateWheelPicker from './components/DateWheelPicker';
 
 // import doctorImage from './assets/doctor.png';
 
@@ -100,11 +101,17 @@ const PatientEvaluationScreen = () => {
       {/* -------------------------------FECHAS ------------------------------- */}
 
       
-      <Text style={styles.label}>Última fecha de menstruación</Text>
-      <View style={styles.datePickerArea}></View>
+      <View style={styles.datePickerArea}>{
+        <DateWheelPicker 
+          title='Última fecha de menstruación'
+        />
+      }</View>
 
-      <Text style={styles.label}>Fecha probable de parto</Text>
-      <View style={styles.datePickerArea}></View>
+      <View style={styles.datePickerArea}>{
+        <DateWheelPicker 
+          title='Fecha probable de parto'
+        />
+      }</View>
 
       <TouchableOpacity style={styles.saveButton}>
         <Text style={styles.buttonText}>Guardar</Text>
@@ -195,10 +202,10 @@ const styles = StyleSheet.create({
     marginBottom: 10,
   },
   datePickerArea: {
-    width: '97%',
-    height: 200,
-    marginBottom: 15,
-    marginTop: 10,
+    // width: '97%',
+    // height: 200,
+    marginBottom: 5,
+    marginTop: 25,
     borderRadius: 15,
     backgroundColor: '#fff',
   },

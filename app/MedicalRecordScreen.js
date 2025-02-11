@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { View, Text, TextInput, Button, TouchableOpacity, StyleSheet, ScrollView, Image } from 'react-native';
 import { Picker } from '@react-native-picker/picker';
 import FloatingLabelInput from './components/FloatingLabelInput';
+import DateWheelPicker from './components/DateWheelPicker';
 
 export default function MedicalRecordScreen() {
   const [showArea, setShowArea] = useState(false);
@@ -29,10 +30,14 @@ export default function MedicalRecordScreen() {
       <Text style={styles.dateLabel}>Hora: 14:30</Text>
       
       <TouchableOpacity style={styles.expandButton} onPress={() => setShowArea(!showArea)}>
-        <Text style={styles.buttonText}>{showArea ? 'Ocultar calendario' : 'Mostrar calendario'}</Text>
+        <Text style={styles.buttonText}>{showArea ? 'Cerrar' : 'Cambiar fecha'}</Text>
       </TouchableOpacity>
       {/*{showArea && <View style={styles.expandableArea}>{/* Aquí se coloca el componente }</View>}*/}
-      {showArea && <View style={styles.expandableArea}></View>}
+      {showArea && <View style={styles.expandableArea}>{
+          <DateWheelPicker 
+            title='Arrastrar para elegir fecha'
+          />
+        }</View>}
       
       <Text style={styles.sectionTitle}>Ingrese los siguientes datos</Text>
       
@@ -202,9 +207,9 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
   },
   expandableArea: {
-    width: '100%',
-    height: 500,
-    backgroundColor: '#e6e6e6',
+    // width: '100%',
+    // height: 500,
+    // backgroundColor: '#e6e6e6',
     marginBottom: 10,
   },
   sectionTitle: {
