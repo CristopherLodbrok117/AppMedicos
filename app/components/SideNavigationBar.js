@@ -37,7 +37,7 @@ const SideNavigationBar = () => {
       </Link>
       
 
-      <Link href='/' asChild>
+      <Link href='/PhysicalExplorationScreen' asChild>
         <TouchableOpacity style={styles.navItem} >
           <Ionicons name="body" style={styles.navIcon}  />
           {/* <Text style={styles.navText}>Configuración</Text> */}
@@ -45,7 +45,7 @@ const SideNavigationBar = () => {
       </Link>
       
 
-      <Link href='/' asChild>
+      <Link href='/PatientConditionScreen' asChild>
         <TouchableOpacity style={styles.navItem}>
           <Ionicons name="sad" style={styles.navIcon}  />
           {/* <Text style={styles.navText}>Configuración</Text> */}
@@ -61,7 +61,7 @@ const SideNavigationBar = () => {
       </Link>
       
 
-      <Link href='/AnotherScreen' asChild>
+      <Link href='/DeployedResourcesScreen' asChild>
         <TouchableOpacity style={styles.navItem} >
           <Ionicons name="document-text" style={styles.navIcon}  />
           {/* <Text style={styles.navText}>Configuración</Text> */}
