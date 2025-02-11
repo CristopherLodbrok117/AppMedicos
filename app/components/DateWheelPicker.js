@@ -5,7 +5,7 @@ import TopLabelWheelPicker from './TopLabelWheelPicker';
 
 const DateWheelPicker = ({title}) => {
 
-    const days = Array.from({ length: 32  }, (_, index) => 1 + index);
+    const days = Array.from({ length: 31 }, (_, index) => 1 + index);
     const months = ['Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio'
         , 'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre']
     const years = Array.from({ length: 2100 - 2020 + 1 }, (_, index) => 2020 + index);
