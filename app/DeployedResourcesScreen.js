@@ -4,6 +4,9 @@ import { Picker } from '@react-native-picker/picker';
 import FloatingLabelInput from './components/FloatingLabelInput';
 import CustomPicker from './components/CustomPicker';
 
+// import CustomWheelPicker from './components/CustomWheelPicker';
+import MyWheelPicker from './components/MyWheelPicker';
+
 export default function DeployedResourcesScreen() {
   const [showArea, setShowArea] = useState(false);
   const [vehicleType, setVehicleType] = useState('');
@@ -13,6 +16,11 @@ export default function DeployedResourcesScreen() {
   const [evaluationItem, setEvaluationItem] = useState('');
   
   const firstEvaluationItems = ['No aplica', 'Consciente', 'Respuesta a estimulo verbal', 'Respuesta a estimulo doloroso', 'Inconsciente'];
+
+  resources = ['Jeringas', 'Tapabocas'];
+  resourcesAmount = Array.from({ length: 101 }, (_, index) => index);
+
+  
 
   return (
     <ScrollView contentContainerStyle={styles.container}>
@@ -34,7 +42,27 @@ export default function DeployedResourcesScreen() {
         options={firstEvaluationItems}
       />
 
-      
+      {/* <CustomWheelPicker /> */}
+      {/* <CustomWheelPicker 
+        label="Día"
+        items={["Lunes", "Martes", "Miércoles", "Jueves", "Viernes"]}
+        // selectedItem={1}
+        // onSelect={(item) => console.log("Seleccionado:", item)}
+      /> */}
+      <MyWheelPicker 
+        label='Jeringas'
+        items={resourcesAmount}
+      />
+
+      <MyWheelPicker 
+        label='Tapabocas'
+        items={resourcesAmount}
+      />
+
+      <MyWheelPicker 
+        label='Ejemplo días'
+        items={["Lunes", "Martes", "Miércoles", "Jueves", "Viernes"]}
+      />
 
       <TouchableOpacity style={styles.saveButton}>
         <Text style={styles.buttonText}>Guardar</Text>
