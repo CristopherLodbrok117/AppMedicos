@@ -3,9 +3,11 @@ import { View, Text, TextInput, Button, TouchableOpacity, StyleSheet, ScrollView
 import { Picker } from '@react-native-picker/picker';
 import FloatingLabelInput from './components/FloatingLabelInput';
 import CustomPicker from './components/CustomPicker';
+import DateWheelPicker from './components/DateWheelPicker';
 
 // import CustomWheelPicker from './components/CustomWheelPicker';
 import MyWheelPicker from './components/MyWheelPicker';
+import TopLabelWheelPicker from './components/TopLabelWheelPicker';
 
 export default function DeployedResourcesScreen() {
   const [showArea, setShowArea] = useState(false);
@@ -59,9 +61,18 @@ export default function DeployedResourcesScreen() {
         items={resourcesAmount}
       />
 
-      <MyWheelPicker 
+      <TopLabelWheelPicker 
+        label='Tapabocas'
+        items={resourcesAmount}
+      />
+
+      <TopLabelWheelPicker 
         label='Ejemplo días'
-        items={["Lunes", "Martes", "Miércoles", "Jueves", "Viernes"]}
+        items={["Lunes", "Martes", "Miércoles", "Jueves", "Viernes", "Sabado", "Domingo"]}
+      />
+
+      <DateWheelPicker 
+        title='Elegir fecha'
       />
 
       <TouchableOpacity style={styles.saveButton}>

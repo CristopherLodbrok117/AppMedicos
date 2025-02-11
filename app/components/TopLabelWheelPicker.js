@@ -5,12 +5,10 @@ import { StyleSheet, View, Text, TextInput} from 'react-native';
 import { WheelPicker } from 'react-native-infinite-wheel-picker';
 
 
-const MyWheelPicker = ({label, items}) => {
+const TopLabelWheelPicker = ({label, items}) => {
 
     const [selectedIndex, setSelectedIndex] = React.useState(3);
 
-
-  
     return (
       <View style={styles.container}>
         <Text style={styles.label}>{label}</Text>
@@ -35,17 +33,18 @@ const MyWheelPicker = ({label, items}) => {
     );
 };
 
-export default MyWheelPicker;
+export default TopLabelWheelPicker;
 
 const styles = StyleSheet.create({
     container: {
-      flex: 1,
-      flexDirection: 'row',
-      justifyContent: 'space-evenly',
-      // backgroundColor: '#fff',
+      // flex: 1,
+      // flexDirection: 'row',
+      // justifyContent: 'space-evenly',
+      backgroundColor: '#fff',
       alignItems: 'center',
-      width: '60%',
+      width: 130,
       borderRadius: 15,
+      
       marginBottom: 20, 
     },
     selectedLayoutStyle: {
@@ -69,20 +68,26 @@ const styles = StyleSheet.create({
     containerStyle: { 
       backgroundColor: '#ffffffff', 
       borderRadius: 35,
-      width: 105,
+      // width: 110, // Comentar para hacer adaptable al contenido
       height: 100,
-      
+      marginTop: 10, 
+      marginBottom: 20,
       
   },
     elementTextStyle: { 
       fontSize: 18 
     },
     label: {
-      width: '50%',
+      // width: '50%',
       fontSize: 16,
+      fontWeight: 'bold',
       color: '#03826f',
-      // marginRight: 25,
+
+
+      // marginBottom: 15,
+      marginTop: 15,
       alignSelf: 'center',
+      // justifyContent: 'center',
     },
   });
 
