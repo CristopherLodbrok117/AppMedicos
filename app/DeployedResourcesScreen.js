@@ -4,6 +4,7 @@ import { Picker } from '@react-native-picker/picker';
 import FloatingLabelInput from './components/FloatingLabelInput';
 import CustomPicker from './components/CustomPicker';
 import DateWheelPicker from './components/DateWheelPicker';
+import SideLabelWheelPicker from './components/SideLabelWheelPicker';
 
 // import CustomWheelPicker from './components/CustomWheelPicker';
 import MyWheelPicker from './components/MyWheelPicker';
@@ -19,7 +20,14 @@ export default function DeployedResourcesScreen() {
   
   const firstEvaluationItems = ['No aplica', 'Consciente', 'Respuesta a estimulo verbal', 'Respuesta a estimulo doloroso', 'Inconsciente'];
 
-  resources = ['Jeringas', 'Tapabocas'];
+  resources = ['Agua inyectable 500ml', 'Agua oxigenada', 'Agujas 20x32', 'Algodón paquete'
+    , 'Bata desechable', 'Bolsa negra', 'Bolsa roja', 'Bolsa amarilla', 'Bum free gel', 'Campos estériles'
+    , 'Cánula blanda de aspiración', 'Cánulas nasofaringeas', 'Cánulas orofaringeas', 'Cánula Yankawer'
+    , 'Catéter #12', 'Catéter #14', 'Catéter #16', 'Catéter #18', 'Catéter #20', 'Catéter #22', 'Catéter #24'
+    , 'Cinta Transporte 3m 1', 'Cinta Transporte 3m 2', 'Collarines desechables', 'Cubrebocas'
+    , 'Desinfectante para manos' , 'Desinfectante para superficies', 'Fijador de TE adulto'
+    , 'Fijador de TE pediátrico', 'Gasas estériles', 'Gasas no estériles'];
+
   resourcesAmount = Array.from({ length: 101 }, (_, index) => index);
 
   
@@ -29,51 +37,30 @@ export default function DeployedResourcesScreen() {
       
       <Text style={styles.title}>Recursos Utilizados</Text>
       
-      <Text style={styles.subtitle}>Expediente médico</Text>
+      
 
       <Image
         style={styles.image}
         source={require('./assets/doctor.png')}
       />
       
-      {/* Evaluación inicial */}
-      <CustomPicker 
-        label="Evaluación Inicial"
-        selectedValue={evaluationItem}
-        onValueChange={setEvaluationItem}
-        options={firstEvaluationItems}
-      />
+      <Text style={styles.subtitle}>Arrastre para seleccionar la cantidad de insumos</Text>
 
-      {/* <CustomWheelPicker /> */}
-      {/* <CustomWheelPicker 
-        label="Día"
-        items={["Lunes", "Martes", "Miércoles", "Jueves", "Viernes"]}
-        // selectedItem={1}
-        // onSelect={(item) => console.log("Seleccionado:", item)}
-      /> */}
-      <MyWheelPicker 
-        label='Jeringas'
-        items={resourcesAmount}
-      />
-
-      <MyWheelPicker 
+      <SideLabelWheelPicker 
         label='Tapabocas'
         items={resourcesAmount}
       />
 
-      <TopLabelWheelPicker 
-        label='Tapabocas'
+
+      {resources.map((resource, index) => (
+        <SideLabelWheelPicker key={index}
+          label={resource}
         items={resourcesAmount}
-      />
+        />
+      ))}
 
-      <TopLabelWheelPicker 
-        label='Ejemplo días'
-        items={["Lunes", "Martes", "Miércoles", "Jueves", "Viernes", "Sabado", "Domingo"]}
-      />
 
-      <DateWheelPicker 
-        title='Elegir fecha'
-      />
+
 
       <TouchableOpacity style={styles.saveButton}>
         <Text style={styles.buttonText}>Guardar</Text>
@@ -97,6 +84,7 @@ const styles = StyleSheet.create({
     fontSize: 18,
     fontWeight: '600',
     color: '#555',
+    marginTop: 30,
     marginBottom: 20,
     alignSelf: 'center',
   },
@@ -178,8 +166,8 @@ const styles = StyleSheet.create({
   saveButton: {
     backgroundColor: '#28a745',
     padding: 10,
-    borderRadius: 8,
+    borderRadius: 15,
     marginTop: 20,
-    width: '100%',
+    width: '30%',
   },
 });

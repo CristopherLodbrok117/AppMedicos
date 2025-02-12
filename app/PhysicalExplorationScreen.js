@@ -28,13 +28,7 @@ export default function PhysicalExplorationScreen() {
         source={require('./assets/doctor.png')}
       />
       
-      {/* Evaluación inicial */}
-      <CustomPicker 
-        label="Evaluación Inicial"
-        selectedValue={evaluationItem}
-        onValueChange={setEvaluationItem}
-        options={firstEvaluationItems}
-      />
+      <Text style={styles.subtitle}>Pendiente a implementación</Text>
 
       
 
