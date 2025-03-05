@@ -2,11 +2,27 @@ import React, { useState } from 'react';
 import { View, Text, TextInput, Button, TouchableOpacity, StyleSheet, ScrollView, Image } from 'react-native';
 import { Picker } from '@react-native-picker/picker';
 import DateWheelPicker from './components/DateWheelPicker';
+import FloatingLabelInput from './components/FloatingLabelInput';
 
 // import doctorImage from './assets/doctor.png';
 
 const PatientEvaluationScreen = () => {
   // const [showArea, setShowArea] = useState(false);
+
+  const [otherCause, setOtherCause] = useState('');
+  const [injuryCause, setInjuryCause] = useState('');
+  const [secondCause, setSecondCause] = useState('');
+  const [specificCause, setSpecificCause] = useState('');
+  const [minute1, setMinute1] = useState('');
+  const [minute5, setMinute5] = useState('');
+  const [minute10, setMinute10] = useState('');
+  const [gesta, setGesta] = useState('');
+  const [para, setPara] = useState('');
+  const [ceasrean, setCesarean] = useState('');
+  const [abortion, setAbortion] = useState('');
+  
+  
+
   const [showApgar, setShowApgar] = useState(false);
   const [vehicleType, setVehicleType] = useState('');
 
@@ -28,11 +44,12 @@ const PatientEvaluationScreen = () => {
         <Picker.Item label="Otro" value="Otro" />
       </Picker>
 
-      <Text style={styles.label}>En caso de otra causa traumática, indicar cual</Text>
-      <TextInput style={styles.input} placeholder="Otro" />
+      {/* <Text style={styles.label}>En caso de otra causa traumática, indicar cual</Text>
+      <TextInput style={styles.input} placeholder="Otro" /> */}
+      <FloatingLabelInput label="En caso de otra causa traumática, indicar cual" iconName="personal-injury" value={otherCause} onChangeText={setOtherCause} />
 
-      <Text style={styles.label}>Mecanismo de lesión</Text>
-      <TextInput style={styles.input} placeholder="Describir..." />
+      <FloatingLabelInput label="Mecanismo de lesión" iconName="healing" value={injuryCause} onChangeText={setInjuryCause} />
+  
       
       
       <Text style={styles.label}>Causa clínica (órigen probable)</Text>
@@ -41,11 +58,11 @@ const PatientEvaluationScreen = () => {
         <Picker.Item label="Accidente" value="Accidente" />
       </Picker>
 
-      <Text style={styles.label}>En caso de otra causa clínica, indicar cual</Text>
-      <TextInput style={styles.input} placeholder="Escribir..." />
+      <FloatingLabelInput label="En caso de otra causa clínica, indicar cual" iconName="domain" value={secondCause} onChangeText={setSecondCause} />
+  
 
-      <Text style={styles.label}>Causa específica</Text>
-      <TextInput style={styles.input} placeholder="Escribir..." />
+      <FloatingLabelInput label="Causa específica" iconName="medical-services" value={specificCause} onChangeText={setSpecificCause} />
+  
 
 
       {/* -------------------------------Sección parto-------------------------------- */}
@@ -77,26 +94,19 @@ const PatientEvaluationScreen = () => {
       {/* --------------------------------------------------------------- */}
       <Text style={styles.sectionTitle}>Observaciones</Text>
 
-      <Text style={styles.label}>Minuto 1</Text>
-      <TextInput style={styles.input} placeholder="Observaciones..." />
+      <FloatingLabelInput label="Minuto 1" iconName="access-time" value={minute1} onChangeText={setMinute1} />
 
-      <Text style={styles.label}>Minuto 5</Text>
-      <TextInput style={styles.input} placeholder="Observaciones..." />
+      <FloatingLabelInput label="Minuto 5" iconName="access-time" value={minute5} onChangeText={setMinute5} />
+ 
+      <FloatingLabelInput label="Minuto 10" iconName="access-time" value={minute10} onChangeText={setMinute10} />
+ 
+      <FloatingLabelInput label="Gesta" iconName="view-list" value={gesta} onChangeText={setGesta} />
 
-      <Text style={styles.label}>Minuto 10</Text>
-      <TextInput style={styles.input} placeholder="Observaciones..." />
-
-      <Text style={styles.label}>Gesta</Text>
-      <TextInput style={styles.input} placeholder="Gesta" />
-
-      <Text style={styles.label}>Para</Text>
-      <TextInput style={styles.input} placeholder="Para" />
-
-      <Text style={styles.label}>Cesarea</Text>
-      <TextInput style={styles.input} placeholder="Cesarea" />
-
-      <Text style={styles.label}>Aborto</Text>
-      <TextInput style={styles.input} placeholder="Aborto" />
+      <FloatingLabelInput label="Para" iconName="pregnant-woman" value={para} onChangeText={setPara} />
+ 
+      <FloatingLabelInput label="Cesárea" iconName="pregnant-woman" value={ceasrean} onChangeText={setCesarean} />
+      
+      <FloatingLabelInput label="Aborto" iconName="cancel" value={abortion} onChangeText={setAbortion} />
 
       {/* -------------------------------FECHAS ------------------------------- */}
 

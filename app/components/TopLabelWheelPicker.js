@@ -51,6 +51,8 @@ const styles = StyleSheet.create({
       backgroundColor: '#00000000',
       color: '#03826f',
       borderRadius: 20,
+      borderColor: '#dde',
+      borderWidth: 2,
       
       // borderBottomWidth: 2, // Borde superior
       // borderBottomColor: '#20b2aa',
@@ -58,10 +60,10 @@ const styles = StyleSheet.create({
       // borderTopColor: '#20b2aa',
 
       // Shadow for iOS
-      shadowColor: '#000',
-      shadowOffset: { width: 0, height: 0 },
-      shadowOpacity: 0.5,
-      shadowRadius: 10,
+      // shadowColor: '#000',
+      // shadowOffset: { width: 0, height: 0 },
+      // shadowOpacity: 0.5,
+      // shadowRadius: 10,
       // Shadow for Android
       elevation: 10,
     },

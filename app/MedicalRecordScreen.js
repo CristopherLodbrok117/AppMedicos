@@ -3,6 +3,7 @@ import { View, Text, TextInput, Button, TouchableOpacity, StyleSheet, ScrollView
 import { Picker } from '@react-native-picker/picker';
 import FloatingLabelInput from './components/FloatingLabelInput';
 import DateWheelPicker from './components/DateWheelPicker';
+import CustomPicker from './components/CustomPicker';
 
 export default function MedicalRecordScreen() {
   const [showArea, setShowArea] = useState(false);

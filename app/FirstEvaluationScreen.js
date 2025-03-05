@@ -10,6 +10,7 @@ export default function MedicalRecordScreen() {
 
   const [vehicleNum, setVehicleNum] = useState('');
 
+  /* Variables */
   const [evaluationItem, setEvaluationItem] = useState('');
   const [ventilationItem, setVentilationItem] = useState('');
   const [circulationItem, setCirculationItem] = useState('');
@@ -22,6 +23,7 @@ export default function MedicalRecordScreen() {
   const [skinItem, setSkinItem] = useState('');
   const [characteristicsItem, setCharacteristicsItem] = useState('');
   
+  /* Item values */
   const firstEvaluationItems = ['No aplica', 'Consciente', 'Respuesta a estimulo verbal', 'Respuesta a estimulo doloroso', 'Inconsciente'];
   const ventilationItems = ['No aplica', 'Automatismo regular', 'Automatismo irregular', 'Ventilación rápida', 'Ventilación superficial', 'Apnea'];
   const circulationItems = ['No aplica', 'Carotideo', 'Radial', 'Paro cardiorespiratorio'];

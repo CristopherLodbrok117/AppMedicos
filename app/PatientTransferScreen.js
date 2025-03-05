@@ -1,10 +1,24 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { StyleSheet, Text, TextInput, View, Image, ScrollView, Pressable } from 'react-native';
 
 import icon from './assets/favicon.png';
+import FloatingLabelInput from './components/FloatingLabelInput';
 
 
 const PatientTransferScreen = () => {
+
+  /* Variables */ 
+  const [institution, setInstitution] = useState('');
+  const [patientName, setPatientName] = useState('');
+  const [witnessName, setWitnessName] = useState('');
+  const [observations, setObservations] = useState('');
+  const [dependencies, setDependencies] = useState('');
+  const [units, setUnits] = useState('');
+  const [officerName, setOfficerName] = useState('');
+  const [belongings, setBelongings] = useState('');
+  const [receiver, setReceiver] = useState('');
+  
+
   return (
     <View style={styles.container}>
       {/* Barra de navegación izquierda */}
@@ -24,6 +38,8 @@ const PatientTransferScreen = () => {
           source={require('./assets/doctor.png')}
         />
 
+<FloatingLabelInput label='Institución a la que se traslada el paciente' iconName='location-pin' value={institution} onChangeText={setInstitution}/>
+
         {/* Disclaimer */}
         <View style={styles.loremContainer}>
           <Text style={styles.loremText}>
@@ -33,17 +49,25 @@ const PatientTransferScreen = () => {
 
         {/* Información del paciente */}
         <Text style={styles.sectionSubtitle}>Información del paciente</Text>
-        <TextInput style={styles.input} placeholder="Nombre del paciente" />
-        <TextInput style={styles.input} placeholder="Nombre del testigo" />
-        <TextInput style={styles.input} placeholder="Observaciones" />
+
+        <FloatingLabelInput label='Nombre del paciente' iconName='person' value={patientName} onChangeText={setPatientName}/>
+
+        <FloatingLabelInput label='Nombre del testigo' iconName='person-outline' value={witnessName} onChangeText={setWitnessName}/>
+
+        <FloatingLabelInput label='Observaciones' iconName='mode-edit' value={observations} onChangeText={setObservations}/>
 
         {/* Sección de dependencias */}
         <Text style={styles.sectionSubtitle}>Dependencias que atendieron al paciente</Text>
-        <TextInput style={styles.input} placeholder="Dependencias" />
-        <TextInput style={styles.input} placeholder="Número de unidades" />
-        <TextInput style={styles.input} placeholder="Nombre del encargado y/o oficiales" />
-        <TextInput style={styles.input} placeholder="Pertenencias" />
-        <TextInput style={styles.input} placeholder="Nombre de quien recibe las pertenencias" />
+
+        <FloatingLabelInput label='Dependencias' iconName='apartment' value={dependencies} onChangeText={setDependencies} />
+
+        <FloatingLabelInput label='Número de unidades' iconName='fire-truck' value={units} onChangeText={setUnits}/>
+
+        <FloatingLabelInput label='Nombre del encargado y/o oficiales' iconName='person-4' value={officerName} onChangeText={setOfficerName}/>
+
+        <FloatingLabelInput label='Pertenencias' iconName='backpack' value={belongings} onChangeText={setBelongings}/>
+
+        <FloatingLabelInput label='Nombre de quien recibe las pertenencias' iconName='mode-edit' value={receiver} onChangeText={setReceiver}/>
 
         {/* Entrega */}
         <Text style={styles.sectionSubtitle}>Entrega a paciente</Text>
@@ -105,7 +129,7 @@ const styles = StyleSheet.create({
     borderRadius: 8,
     justifyContent: 'center',
     padding: 10,
-    marginBottom: 20,
+    marginTop: 20,
   },
   loremText: {
     fontSize: 14,
@@ -116,8 +140,7 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: '600',
     color: '#444',
-    marginBottom: 10,
-    marginTop: 20,
+    marginTop: 35,
     alignSelf: 'flex-start',
   },
   input: {

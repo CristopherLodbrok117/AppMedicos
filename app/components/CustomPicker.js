@@ -28,6 +28,7 @@ const styles = StyleSheet.create({
     color: '#03826f',
     marginTop: 20,
     marginBottom: 5,
+    marginLeft: 3,
     alignSelf: 'flex-start',
   },
   picker: {
