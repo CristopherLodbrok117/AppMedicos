@@ -7,16 +7,32 @@ import CustomPicker from './components/CustomPicker';
 
 export default function MedicalRecordScreen() {
   const [showArea, setShowArea] = useState(false);
+  const [weekDay, setWeekDay] = useState('');
+  const[attentionReason, setAttentionReasons] = useState('');
+  const[serviceLocation, setServiceLocation] = useState('');
   const [vehicleType, setVehicleType] = useState('');
-
   const [vehicleNum, setVehicleNum] = useState('');
+  const [operator, setOperator] = useState('');
+  const [intern, setIntern] = useState('');
+  const [moreInterns, setMoreInterns] = useState('');
   const [affiliation, setAffiliation] = useState('');
+  const [gender, setGender] = useState('');
+
   const [age, setAge] = useState('');
   const [address, setAddress] = useState('');
   const [colony, setColony] = useState('');
   const [municipality, setMunicipality] = useState('');
   const [phone, setPhone] = useState('');
   const [rightful, setRightful] = useState('');
+
+  /* Custom picker items */ 
+  const weekDays = ['Lunes','Martes', 'Miercoles', 'Jueves', 'Viernes', 'Sabado', 'Domingo'];
+  const attentionReasons = ['Enfermedad', 'Traumatismo','Gineco obstétrico'];
+  const serviceLocations = ['Cucei', 'Inst. Dep.', 'Politécnico', 'Vocacional', 'Prepa 12', 'Via pública'];
+  const vehicleTypes = ['Vehiculo oficial', 'Cuatrimoto', 'Ambulancia', 'Ambulancia eléctrica', 'Otro'];
+  const operators = ['Javier Iñiguez', 'Rodrigo Guitierrez', 'Yair Villagrana', 'Jesús Hernandez', 'Jaime Juárez', 'Aida García'];
+  const interns = ['Javier Iñiguez', 'Rodrigo Guitierrez', 'Yair Villagrana', 'Jesús Hernandez', 'Jaime Juárez', 'Aida García'];
+  const genders = ['Masculino', 'Femenino'];
   
 
   return (
@@ -43,34 +59,34 @@ export default function MedicalRecordScreen() {
       <Text style={styles.sectionTitle}>Ingrese los siguientes datos</Text>
       
       {/* Selectores */}
-      <Text style={styles.label}>Día de la semana</Text>
-      <Picker style={styles.picker}>
-        <Picker.Item label="Lunes" value="Lunes" />
-        <Picker.Item label="Martes" value="Martes" />
-        <Picker.Item label="Miércoles" value="Miércoles" />
-        <Picker.Item label="Jueves" value="Jueves" />
-        <Picker.Item label="Viernes" value="Viernes" />
-      </Picker>
+      <CustomPicker 
+        label='Día de la semana'
+        selectedValue={weekDay}
+        onValueChange={setWeekDay}
+        options={weekDays}
+      />
+
+      <CustomPicker 
+        label='Motivo de la atención'
+        selectedValue={attentionReason}
+        onValueChange={setAttentionReasons}
+        options={attentionReasons}
+      />
       
-      <Text style={styles.label}>Motivo de la atención</Text>
-      <Picker style={styles.picker}>
-        <Picker.Item label="Enfermedad" value="Enfermedad" />
-        <Picker.Item label="Accidente" value="Accidente" />
-      </Picker>
-      
-      <Text style={styles.label}>Ubicación del servicio</Text>
-      <Picker style={styles.picker}>
-        <Picker.Item label="Cucei" value="Cucei" />
-        <Picker.Item label="Calle" value="Calle" />
-      </Picker>
-      
-      <Text style={styles.label}>Vehículo</Text>
-      <Picker style={styles.picker} selectedValue={vehicleType} onValueChange={(value) => setVehicleType(value)}>
-        <Picker.Item label="Carro" value="Carro" />
-        <Picker.Item label="Camioneta" value="Camioneta" />
-        <Picker.Item label="Otro" value="Otro" />
-      </Picker>
-      
+      <CustomPicker 
+        label='Ubicación del servicio'
+        selectedValue={serviceLocation}
+        onValueChange={setServiceLocation}
+        options={serviceLocations}
+      />
+
+      <CustomPicker 
+        label='Vehículo'
+        selectedValue={vehicleType}
+        onValueChange={setVehicleType}
+        options={vehicleTypes}
+      />
+
       {vehicleType === 'Otro' && (
         <TextInput style={styles.input} placeholder="Especificar otro" />
       )}
@@ -79,28 +95,32 @@ export default function MedicalRecordScreen() {
       <TextInput style={styles.input} placeholder="Número de vehículo" /> */}
       <FloatingLabelInput label="Número de vehículo" iconName="directions-car" value={vehicleNum} onChangeText={setVehicleNum} />
       
-      <Text style={styles.label}>Operador</Text>
-      <Picker style={styles.picker}>
-        <Picker.Item label="Malcolm" value="Malcolm" />
-        <Picker.Item label="Reese" value="Reese" />
-        <Picker.Item label="Dewey" value="Dewey" />
-      </Picker>
+      <CustomPicker 
+        label='Operador'
+        selectedValue={operator}
+        onValueChange={setOperator}
+        options={operators}
+      />
+
+      <CustomPicker 
+        label='Prestador de servicio'
+        selectedValue={intern}
+        onValueChange={setIntern}
+        options={interns}
+      />
       
-      <Text style={styles.label}>Prestador de servicio</Text>
-      <Picker style={styles.picker}>
-        <Picker.Item label="Hal" value="Hal" />
-        <Picker.Item label="Louise" value="Louise" />
-      </Picker>
-      
+      <FloatingLabelInput label="Otros prestadores" iconName="groups" value={moreInterns} onChangeText={setMoreInterns} />
+
       {/* <Text style={styles.label}>Nombre o media filiación</Text>
       <TextInput style={styles.input} placeholder="Nombre o media filiación" /> */}
       <FloatingLabelInput label="Nombre o media filiación" iconName="face" value={affiliation} onChangeText={setAffiliation} />
       
-      <Text style={styles.label}>Género</Text>
-      <Picker style={styles.picker}>
-        <Picker.Item label="Masculino" value="Masculino" />
-        <Picker.Item label="Femenino" value="Femenino" />
-      </Picker>
+      <CustomPicker 
+        label='Género'
+        selectedValue={gender}
+        onValueChange={setGender}
+        options={genders}
+      />
       
       {/* <Text style={styles.label}>Edad</Text>
       <TextInput style={styles.input} placeholder="Ej. 18" keyboardType="numeric" /> */}

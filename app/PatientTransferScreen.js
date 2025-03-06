@@ -3,6 +3,7 @@ import { StyleSheet, Text, TextInput, View, Image, ScrollView, Pressable } from 
 
 import icon from './assets/favicon.png';
 import FloatingLabelInput from './components/FloatingLabelInput';
+import CustomPicker from './components/CustomPicker';
 
 
 const PatientTransferScreen = () => {
@@ -17,6 +18,13 @@ const PatientTransferScreen = () => {
   const [officerName, setOfficerName] = useState('');
   const [belongings, setBelongings] = useState('');
   const [receiver, setReceiver] = useState('');
+
+  const [paramedicName, setParamedicName] = useState('');
+  const [doctorName, setDoctorName] = useState('');
+
+  /* CustomPicker items */
+  const paramedicNames = ['TSUP Rodrigo de Jesus Guitierrez Vega', 'Dalto', 'Bryan'];
+  const doctorNames = ['Dr. House', 'Dr. Who', 'Dr. Strange'];
   
 
   return (
@@ -70,16 +78,27 @@ const PatientTransferScreen = () => {
         <FloatingLabelInput label='Nombre de quien recibe las pertenencias' iconName='mode-edit' value={receiver} onChangeText={setReceiver}/>
 
         {/* Entrega */}
-        <Text style={styles.sectionSubtitle}>Entrega a paciente</Text>
-        <TextInput style={styles.input} placeholder="Paramédico" />
+        {/* <Text style={styles.sectionSubtitle}>Entrega a paciente</Text>
+        <TextInput style={styles.input} placeholder="Paramédico" /> */}
+        <CustomPicker 
+          label='Entrega a paciente'
+          selectedValue={paramedicName}
+          onValueChange={setParamedicName}
+          options={paramedicNames}
+        />
 
         {/* Medico */}
-        <Text style={styles.sectionSubtitle}>Médico que recibe</Text>
-        <TextInput style={styles.input} placeholder="Nombre completo" />
+        <FloatingLabelInput label='Médico que recibe' iconName='person' value={doctorName} onChangeText={setDoctorName}/>
+        {/* <CustomPicker 
+          label='Médico que recibe'
+          selectedValue={doctorName}
+          onValueChange={setDoctorName}
+          options={doctorNames}
+        /> */}
 
         {/* Finalizar */}
         <Pressable style={styles.saveButton}>
-          <Text style={styles.saveButtonText}>Guardar</Text>
+          <Text style={styles.saveButtonText}>Guardar</Text> 
         </Pressable>
 
       </ScrollView>

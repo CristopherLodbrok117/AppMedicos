@@ -24,8 +24,11 @@ const styles = StyleSheet.create({
     width: '100%'
   },
   label: {
+    
     fontSize: 16,
-    color: '#03826f',
+    fontWeight: '600',
+    color: '#444',
+    // color: '#03826f',
     marginTop: 20,
     marginBottom: 5,
     marginLeft: 3,
@@ -35,7 +38,7 @@ const styles = StyleSheet.create({
     width: '100%',
     height: 50,
     backgroundColor: '#f9f9f9',
-    marginBottom: 10,
+    marginBottom: 5,
   },
 });
 

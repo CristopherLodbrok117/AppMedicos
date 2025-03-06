@@ -3,6 +3,7 @@ import { View, Text, TextInput, Button, TouchableOpacity, StyleSheet, ScrollView
 import { Picker } from '@react-native-picker/picker';
 import DateWheelPicker from './components/DateWheelPicker';
 import FloatingLabelInput from './components/FloatingLabelInput';
+import CustomPicker from './components/CustomPicker';
 
 // import doctorImage from './assets/doctor.png';
 
@@ -24,7 +25,20 @@ const PatientEvaluationScreen = () => {
   
 
   const [showApgar, setShowApgar] = useState(false);
-  const [vehicleType, setVehicleType] = useState('');
+  
+  /* CustomPicker variables  */
+  const [traumaCause, setTraumaCause] = useState('');
+  const [clinicCause, setClinicCause] = useState('');
+  const [product, setProduct] = useState('');
+  const [gender, setGender] = useState('');
+
+  const traumaCauses = ['Otro', 'Arma', 'Automotor', 'Maquinaria', 'Bicicleta', 'Herramienta', 'Electricidad'
+    , 'Fuego', 'Sustancia caliente', 'Producto biológico', 'Sustancia tóxica', 'Juguete', 'Explosión'
+    , 'Ser humano', 'Animal'];
+  const clinicCauses = ['Otro', 'Neurología', 'Cardiovascular', 'Respiratorio', 'Metabólico', 'Digestiva'
+    , 'Urogenital', 'Gineco obstétrica', 'Psico emotiva', 'Músculo esquelético', 'infecciosa', 'Oncológico'];
+  const products = ['No aplica', 'Vivo', 'Muerto'];
+  const genders = ['No aplica', 'Masculino', 'Femenino'];
 
   return (
     <ScrollView contentContainerStyle={styles.container}>
@@ -36,13 +50,13 @@ const PatientEvaluationScreen = () => {
         source={require('./assets/doctor.png')}
       />
 
+      <CustomPicker 
+        label = 'Causa traumática (agente casual)'
+        selectedValue={traumaCause}
+        onValueChange={setTraumaCause}
+        options={traumaCauses}
+      />
 
-
-      <Text style={styles.label}>Causa traumática (agente casual)</Text>
-      <Picker style={styles.picker}>
-        <Picker.Item label="Arma" value="Arma" />
-        <Picker.Item label="Otro" value="Otro" />
-      </Picker>
 
       {/* <Text style={styles.label}>En caso de otra causa traumática, indicar cual</Text>
       <TextInput style={styles.input} placeholder="Otro" /> */}
@@ -50,13 +64,12 @@ const PatientEvaluationScreen = () => {
 
       <FloatingLabelInput label="Mecanismo de lesión" iconName="healing" value={injuryCause} onChangeText={setInjuryCause} />
   
-      
-      
-      <Text style={styles.label}>Causa clínica (órigen probable)</Text>
-      <Picker style={styles.picker}>
-        <Picker.Item label="Otro" value="Otro" />
-        <Picker.Item label="Accidente" value="Accidente" />
-      </Picker>
+      <CustomPicker 
+        label = 'Causa clínica (órigen probable)'
+        selectedValue={clinicCause}
+        onValueChange={setClinicCause}
+        options={clinicCauses}
+      />
 
       <FloatingLabelInput label="En caso de otra causa clínica, indicar cual" iconName="domain" value={secondCause} onChangeText={setSecondCause} />
   
@@ -68,19 +81,19 @@ const PatientEvaluationScreen = () => {
       {/* -------------------------------Sección parto-------------------------------- */}
       <Text style={styles.sectionTitle}>Información de parto</Text>
 
-      <Text style={styles.label}>Producto</Text>
-      <Picker style={styles.picker}>
-        <Picker.Item label="No aplica" value="No aplica" />
-        <Picker.Item label="Vivo" value="Vivo" />
-        <Picker.Item label="Muerto" value="Muerto" />
-      </Picker>
+      <CustomPicker 
+        label = 'Producto'
+        selectedValue={product}
+        onValueChange={setProduct}
+        options={products}
+      />
 
-      <Text style={styles.label}>Sexo</Text>
-      <Picker style={styles.picker}>
-        <Picker.Item label="No aplica" value="No aplica" />
-        <Picker.Item label="Masculino" value="Masculino" />
-        <Picker.Item label="Femenino" value="Femenino" />
-      </Picker>
+      <CustomPicker 
+        label = 'Sexo'
+        selectedValue={gender}
+        onValueChange={setGender}
+        options={genders}
+      />
 
 
       {/* -------------------------------APGAR-------------------------------- */}
