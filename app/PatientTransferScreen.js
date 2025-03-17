@@ -4,6 +4,7 @@ import { StyleSheet, Text, TextInput, View, Image, ScrollView, Pressable } from 
 import icon from './assets/favicon.png';
 import FloatingLabelInput from './components/FloatingLabelInput';
 import CustomPicker from './components/CustomPicker';
+import RedirectButton from './components/RedirectButton';
 
 
 const PatientTransferScreen = () => {
@@ -58,7 +59,20 @@ const PatientTransferScreen = () => {
         {/* Información del paciente */}
         <Text style={styles.sectionSubtitle}>Información del paciente</Text>
 
-        <FloatingLabelInput label='Nombre del paciente' iconName='person' value={patientName} onChangeText={setPatientName}/>
+        {/* Firma paciente */}
+        
+        <View style={styles.signature}>
+          <View style={styles.signatureInput}>
+          <FloatingLabelInput label='Nombre del paciente' iconName='person' value={patientName} onChangeText={setPatientName}/>
+          </View>
+
+          <View style={styles.signatureButton}>
+            <RedirectButton
+              refName='SignatureTestScreen'
+              iconName='edit-square'
+            />
+          </View>
+        </View>
 
         <FloatingLabelInput label='Nombre del testigo' iconName='person-outline' value={witnessName} onChangeText={setWitnessName}/>
 
@@ -80,15 +94,45 @@ const PatientTransferScreen = () => {
         {/* Entrega */}
         {/* <Text style={styles.sectionSubtitle}>Entrega a paciente</Text>
         <TextInput style={styles.input} placeholder="Paramédico" /> */}
-        <CustomPicker 
-          label='Entrega a paciente'
-          selectedValue={paramedicName}
-          onValueChange={setParamedicName}
-          options={paramedicNames}
-        />
+        
+        {/* Firma paramédico*/}
+        <View style={styles.signature}>
+          <View style={styles.signatureInput}>
+            <CustomPicker
+              label='Entrega a paciente'
+              selectedValue={paramedicName}
+              onValueChange={setParamedicName}
+              options={paramedicNames}
+            />
+          </View>
 
-        {/* Medico */}
-        <FloatingLabelInput label='Médico que recibe' iconName='person' value={doctorName} onChangeText={setDoctorName}/>
+          <View style={styles.signatureButton}>
+            <RedirectButton
+              refName='SignatureTestScreen'
+              iconName='edit-square'
+            />
+          </View>
+        </View>
+
+        {/* Medico firma*/}
+        <View style={styles.signature}>
+          <View style={styles.signatureInput}>
+            <FloatingLabelInput
+              label='Médico que recibe'
+              iconName='person'
+              value={doctorName}
+              onChangeText={setDoctorName}
+            />
+          </View>
+
+          <View style={styles.signatureButton}>
+            <RedirectButton
+              refName='SignatureTestScreen'
+              iconName='edit-square'
+            />
+          </View>
+        </View>
+        
         {/* <CustomPicker 
           label='Médico que recibe'
           selectedValue={doctorName}
@@ -194,4 +238,17 @@ const styles = StyleSheet.create({
     fontWeight: '600',
     textAlign: 'center',
   },
+  signature: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+  },
+  signatureInput: {
+     width: '75%',
+    //  backgroundColor: 'grey',
+  },
+  signatureButton: {
+    width: '20%',
+    
+    // backgroundColor: 'grey',
+  }
 });

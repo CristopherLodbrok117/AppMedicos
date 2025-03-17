@@ -61,7 +61,7 @@ const SideNavigationBar = () => {
       </Link>
       
 
-      <Link href='/SignatureTestScreen' asChild>
+      <Link href='/DeployedResourcesScreen' asChild>
         <TouchableOpacity style={styles.navItem} >
           <Ionicons name="document-text" style={styles.navIcon}  />
           {/* <Text style={styles.navText}>Configuración</Text> */}

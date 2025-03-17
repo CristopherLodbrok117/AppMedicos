@@ -82,7 +82,7 @@ const SignaturePad = () => {
       </View>
 
       <TouchableOpacity style={styles.clearButton} onPress={handleClear}>
-        <Text style={styles.clearButtonText}>Clear Signature</Text>
+        <Text style={styles.clearButtonText}>Limpiar firma</Text>
       </TouchableOpacity>
     </View>
   );
@@ -95,7 +95,7 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    backgroundColor: '#f5f5f5',
+    backgroundColor: '#fff', //''#f5f5f5'
   },
   signatureContainer: {
     width: '95%',
@@ -115,7 +115,7 @@ const styles = StyleSheet.create({
   },
   clearButton: {
     marginTop: 20,
-    backgroundColor: '#ff4444',
+    backgroundColor: '#122',
     paddingVertical: 12,
     paddingHorizontal: 30,
     borderRadius: 25,
