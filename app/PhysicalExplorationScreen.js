@@ -3,6 +3,7 @@ import { View, Text, TextInput, Button, TouchableOpacity, StyleSheet, ScrollView
 import { Picker } from '@react-native-picker/picker';
 import FloatingLabelInput from './components/FloatingLabelInput';
 import CustomPicker from './components/CustomPicker';
+import IconImageV1 from './components/IconImageV1';
 
 export default function PhysicalExplorationScreen() {
   const [showArea, setShowArea] = useState(false);
@@ -27,8 +28,14 @@ export default function PhysicalExplorationScreen() {
         style={styles.image}
         source={require('./assets/doctor.png')}
       />
+
+      <Text style={styles.subtitle}>Zona de lesión</Text>
+
+      <View style={styles.imageArea}>
+        <IconImageV1 />
+      </View>
       
-      <Text style={styles.subtitle}>Pendiente a implementación</Text>
+      
 
       
 
@@ -138,5 +145,11 @@ const styles = StyleSheet.create({
     borderRadius: 8,
     marginTop: 20,
     width: '100%',
+  },
+
+  imageArea: {
+    width: 500,
+    height: 300,
+    backgroundColor: '#fff',
   },
 });
