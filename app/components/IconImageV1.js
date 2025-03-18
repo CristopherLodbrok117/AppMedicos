@@ -85,6 +85,7 @@ const styles = StyleSheet.create({
     height: "100%",
     position: "absolute",
     resizeMode: 'contain',
+    tintColor: 'black',
   },
   button: {
     position: "absolute",
