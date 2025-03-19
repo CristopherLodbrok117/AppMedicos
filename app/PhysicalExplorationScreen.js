@@ -4,18 +4,31 @@ import { Picker } from '@react-native-picker/picker';
 import FloatingLabelInput from './components/FloatingLabelInput';
 import CustomPicker from './components/CustomPicker';
 import IconImageV1 from './components/IconImageV1';
+import CheckListV1 from './components/CheckListV1';
+import globalStyles from './styles/globalStyles';
+
+const INJURIES = [
+  "Deformidades (D)",
+  "Contusiones (CD)",
+  "Abrasiones (A)",
+  "Penetraciones (P)",
+  "Movimiento paradouico (MP)",
+  "Creptación (C)",
+  "Heridas (H)",
+  "Fracturas (P)",
+  "Efisema suticutaneo (ES)",
+  "Quemaduras (Q)",
+  "Laceraciones (L)",
+  "Edema (E)",
+  "Alteración de sensibilidad (AS)",
+  "Alteración de movilidad (AM)",
+  "Dolor (DO)",
+];
 
 export default function PhysicalExplorationScreen() {
-  const [showArea, setShowArea] = useState(false);
-  const [vehicleType, setVehicleType] = useState('');
 
-  const [vehicleNum, setVehicleNum] = useState('');
-
-  const [evaluationItem, setEvaluationItem] = useState('');
-
-  
-  const firstEvaluationItems = ['No aplica', 'Consciente', 'Respuesta a estimulo verbal', 'Respuesta a estimulo doloroso', 'Inconsciente'];
-
+  const [selectedInjuries, setSelectedInjuries] = useState([]);
+  const [showInjuries, setShowInjuries] = useState(false);
 
   return (
     <ScrollView contentContainerStyle={styles.container}>
@@ -28,6 +41,17 @@ export default function PhysicalExplorationScreen() {
         style={styles.image}
         source={require('./assets/doctor.png')}
       />
+      
+      <TouchableOpacity style={globalStyles.expandButton} onPress={() => setShowInjuries(!showInjuries)}>
+        <Text style={globalStyles.buttonText}>{showInjuries ? 'Cerrar' : 'Elegir tipo de lesión'}</Text>
+      </TouchableOpacity>
+      {showInjuries && <View style={globalStyles.expandableArea}>{
+        <CheckListV1 
+          items={INJURIES}
+          selectedItems={selectedInjuries}
+          setSelectedItems={setSelectedInjuries}
+        />
+        }</View>}
 
       <Text style={styles.subtitle}>Zona de lesión</Text>
 

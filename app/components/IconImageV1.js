@@ -1,13 +1,13 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { View, Image, TouchableOpacity, StyleSheet } from "react-native";
 import Icon from "react-native-vector-icons/MaterialIcons";
 
 const BUTTONS = [
-  { name: "Deformidades (D)", top: 15, left: 250 },
-  { name: "Contusiones (CD)", top: 30, left: 233 },
-  { name: "Abrasiones (A)", top: 40, left: 248 },
-  { name: "Penetraciones (P)", top: 50, left: 270 },
-  { name: "Movimiento paradouico (MP)", top: 50, left: 215 },
+  { name: "Cabeza", top: 15, left: 250 },
+  { name: "Ojos", top: 30, left: 233 },
+  { name: "Cuello", top: 40, left: 248 },
+  { name: "Hombro derecho", top: 50, left: 270 },
+  { name: "Hombro izquierdo", top: 50, left: 215 },
   { name: "Creptación (C)", top: 60, left: 275 },
   { name: "Heridas (H)", top: 70, left: 245 },
   { name: "Fracturas (P)", top: 80, left: 210 },
@@ -20,21 +20,27 @@ const BUTTONS = [
   { name: "Dolor (DO)", top: 150, left: 265 },
 ];
 
+
 const IconImageV1 = () => {
   const [activeButtons, setActiveButtons] = useState([]); // Controla qué botones están activos
   const [selectedButtons, setSelectedButtons] = useState([]); // Almacena los nombres seleccionados
 
+  useEffect(() => {
+    console.log("Seleccionados:", selectedButtons);
+  }, [selectedButtons]); // Se ejecuta cuando `selectedButtons` cambia
+
   const handlePress = (index, buttonName) => {
-    
     setActiveButtons((prev) =>
       prev.includes(index) ? prev.filter((i) => i !== index) : [...prev, index]
     );
 
-    setSelectedButtons((prev) =>
-      prev.includes(buttonName) ? prev.filter((name) => name !== buttonName) : [...prev, buttonName]
-    );
+    setSelectedButtons((prev) => {
+      const newSelection = prev.includes(buttonName)
+        ? prev.filter((name) => name !== buttonName)
+        : [...prev, buttonName];
 
-    console.log("Seleccionados:", selectedButtons);
+      return newSelection; // Retorna el nuevo estado correctamente
+    });
   };
 
   return (
@@ -55,22 +61,6 @@ const IconImageV1 = () => {
           />
         </TouchableOpacity>
       ))}
-      {/* Botones con iconos */}
-      {/* <TouchableOpacity style={[styles.button, styles.button1]}>
-        <Icon name="star" style={styles.icon} color="white" />
-      </TouchableOpacity>
-
-      <TouchableOpacity style={[styles.button, styles.button2]}>
-        <Icon name="favorite" style={styles.icon} color="white" />
-      </TouchableOpacity>
-
-      <TouchableOpacity style={[styles.button, styles.button3]}>
-        <Icon name="settings" style={styles.icon} color="white" />
-      </TouchableOpacity>
-
-      <TouchableOpacity style={[styles.button, styles.button4]}>
-        <Icon name="person" style={styles.icon} color="white" />
-      </TouchableOpacity> */}
     </View>
   );
 };
