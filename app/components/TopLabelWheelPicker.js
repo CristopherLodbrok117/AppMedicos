@@ -40,7 +40,7 @@ const styles = StyleSheet.create({
       // flex: 1,
       // flexDirection: 'row',
       // justifyContent: 'space-evenly',
-      backgroundColor: '#fff',
+      backgroundColor: 'transparent',
       alignItems: 'center',
       width: 130,
       borderRadius: 15,
@@ -65,7 +65,7 @@ const styles = StyleSheet.create({
       // shadowOpacity: 0.5,
       // shadowRadius: 10,
       // Shadow for Android
-      elevation: 10,
+      // elevation: 10,
     },
     containerStyle: { 
       backgroundColor: '#ffffffff', 

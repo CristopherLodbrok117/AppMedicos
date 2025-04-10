@@ -1,9 +1,9 @@
 import React, { useState } from 'react';
 import { View, Text, TextInput, Button, TouchableOpacity, StyleSheet, ScrollView, Image } from 'react-native';
 import { Picker } from '@react-native-picker/picker';
-import DateWheelPicker from './components/DateWheelPicker';
-import FloatingLabelInput from './components/FloatingLabelInput';
-import CustomPicker from './components/CustomPicker';
+import DateWheelPicker from '../components/DateWheelPicker';
+import FloatingLabelInput from '../components/FloatingLabelInput';
+import CustomPicker from '../components/CustomPicker';
 
 // import doctorImage from './assets/doctor.png';
 
@@ -47,7 +47,7 @@ const PatientEvaluationScreen = () => {
       {/* <View style={styles.imagePlaceholder} /> */}
       <Image
         style={styles.image}
-        source={require('./assets/doctor.png')}
+        source={require('../assets/doctor.png')}
       />
 
       <CustomPicker 

@@ -1,10 +1,9 @@
 import React, { useState } from 'react';
 import { StyleSheet, Text, TextInput, View, Image, ScrollView, Pressable } from 'react-native';
 
-import icon from './assets/favicon.png';
-import FloatingLabelInput from './components/FloatingLabelInput';
-import CustomPicker from './components/CustomPicker';
-import RedirectButton from './components/RedirectButton';
+import FloatingLabelInput from '../components/FloatingLabelInput';
+import CustomPicker from '../components/CustomPicker';
+import RedirectButton from '../components/RedirectButton';
 
 
 const PatientTransferScreen = () => {
@@ -44,7 +43,7 @@ const PatientTransferScreen = () => {
         {/* Imagen */}
         <Image
           style={styles.image}
-          source={require('./assets/doctor.png')}
+          source={require('../assets/doctor.png')}
         />
 
 <FloatingLabelInput label='Institución a la que se traslada el paciente' iconName='location-pin' value={institution} onChangeText={setInstitution}/>

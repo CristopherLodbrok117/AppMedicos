@@ -4,12 +4,15 @@ import SideNavigationBar from "./components/SideNavigationBar";
 
 export default function Layout() {
   return (
-    <View style={styles.container}>
-      <SideNavigationBar />
-      <View style={styles.content}>
-        <Stack />
-      </View>
-    </View>
+    <Stack>
+      <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
+    </Stack>
+    // <View style={styles.container}>
+    //   <SideNavigationBar />
+    //   <View style={styles.content}>
+    //     <Stack />
+    //   </View>
+    // </View>
   );
 }
 

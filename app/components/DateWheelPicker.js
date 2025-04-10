@@ -39,7 +39,7 @@ export default DateWheelPicker;
 const styles = StyleSheet.create({
   container: {
     height: 250,
-    backgroundColor: '#fff',
+    backgroundColor: 'transparent',
     borderRadius: 30,
   },
   title: {

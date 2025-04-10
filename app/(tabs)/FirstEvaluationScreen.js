@@ -1,8 +1,8 @@
 import React, { useState } from 'react';
 import { View, Text, TextInput, Button, TouchableOpacity, StyleSheet, ScrollView, Image } from 'react-native';
 import { Picker } from '@react-native-picker/picker';
-import FloatingLabelInput from './components/FloatingLabelInput';
-import CustomPicker from './components/CustomPicker';
+import FloatingLabelInput from '../components/FloatingLabelInput';
+import CustomPicker from '../components/CustomPicker';
 
 export default function MedicalRecordScreen() {
   const [showArea, setShowArea] = useState(false);
@@ -45,7 +45,7 @@ export default function MedicalRecordScreen() {
 
       <Image
         style={styles.image}
-        source={require('./assets/doctor.png')}
+        source={require('../assets/doctor.png')}
       />
       
       {/* Evaluación inicial */}

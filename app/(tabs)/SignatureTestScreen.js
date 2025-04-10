@@ -1,9 +1,9 @@
 import React, { useState } from 'react';
 import { View, Text, TextInput, Button, TouchableOpacity, StyleSheet, ScrollView, Image } from 'react-native';
 import { Picker } from '@react-native-picker/picker';
-import FloatingLabelInput from './components/FloatingLabelInput';
-import CustomPicker from './components/CustomPicker';
-import SignaturePad from './components/SignaturePad';
+import FloatingLabelInput from '../components/FloatingLabelInput';
+import CustomPicker from '../components/CustomPicker';
+import SignaturePad from '../components/SignaturePad';
 
 
 export default function SignatureTestScreen() {
