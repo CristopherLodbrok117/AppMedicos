@@ -1,5 +1,13 @@
 import React, { useState } from 'react';
-import { View, Text, TextInput, Button, TouchableOpacity, StyleSheet, ScrollView, Image } from 'react-native';
+import { 
+  View, 
+  Text, 
+  TouchableOpacity, 
+  StyleSheet, 
+  ScrollView, 
+  Image,
+  Modal,
+  Pressable, } from 'react-native';
 import { Picker } from '@react-native-picker/picker';
 import FloatingLabelInput from '../components/FloatingLabelInput';
 import CustomPicker from '../components/CustomPicker';
@@ -9,6 +17,7 @@ import SideLabelWheelPicker from '../components/SideLabelWheelPicker';
 // import CustomWheelPicker from './components/CustomWheelPicker';
 import MyWheelPicker from '../components/MyWheelPicker';
 import TopLabelWheelPicker from '../components/TopLabelWheelPicker';
+import HorizontalScrollPicker from '../components/HorizontalScrollPicker';
 
 export default function DeployedResourcesScreen() {
   const [showArea, setShowArea] = useState(false);
@@ -20,7 +29,7 @@ export default function DeployedResourcesScreen() {
   
   const firstEvaluationItems = ['No aplica', 'Consciente', 'Respuesta a estimulo verbal', 'Respuesta a estimulo doloroso', 'Inconsciente'];
 
-  resources = ['Agua inyectable 500ml', 'Agua oxigenada', 'Agujas 20x32', 'Algodón paquete'
+  const resources = ['Agua inyectable 500ml', 'Agua oxigenada', 'Agujas 20x32', 'Algodón paquete'
     , 'Bata desechable', 'Bolsa negra', 'Bolsa roja', 'Bolsa amarilla', 'Bum free gel', 'Campos estériles'
     , 'Cánula blanda de aspiración', 'Cánulas nasofaringeas', 'Cánulas orofaringeas', 'Cánula Yankawer'
     , 'Catéter #12', 'Catéter #14', 'Catéter #16', 'Catéter #18', 'Catéter #20', 'Catéter #22', 'Catéter #24'
@@ -28,13 +37,19 @@ export default function DeployedResourcesScreen() {
     , 'Desinfectante para manos' , 'Desinfectante para superficies', 'Fijador de TE adulto'
     , 'Fijador de TE pediátrico', 'Gasas estériles', 'Gasas no estériles'];
 
-  resourcesAmount = Array.from({ length: 101 }, (_, index) => index);
+  const resourcesAmount = Array.from({ length: 101 }, (_, index) => index);
+  
+  const [selectedValue, setSelectedValue] = useState(0);
 
   
 
   return (
-    <ScrollView contentContainerStyle={styles.container}>
-      
+    <ScrollView contentContainerStyle={styles.container}
+
+      keyboardShouldPersistTaps="handled"
+      horizontal={false}
+      nestedScrollEnabled={true}>
+
       <Text style={styles.title}>Recursos Utilizados</Text>
       
       
@@ -46,7 +61,64 @@ export default function DeployedResourcesScreen() {
       
       <Text style={styles.subtitle}>Arrastre para seleccionar la cantidad de insumos</Text>
 
-      <SideLabelWheelPicker 
+      <TouchableOpacity style={styles.expandButton} onPress={() => setShowArea(true)}>
+        <Text style={styles.buttonText}>Cambiar fecha</Text>
+      </TouchableOpacity>
+
+      {/* <View style={styles.areaArea}>
+        <Text style={styles.label}>Cantidad de {resources[0]}</Text>
+        <HorizontalScrollPicker
+          numbers={resourcesAmount}
+          value={selectedValue}
+          onValueChange={setSelectedValue}
+          itemWidth={80}
+          selectedColor="#20b2aa"
+        />
+      </View>
+      <View style={styles.areaArea}>
+        <Text style={styles.label}>Cantidad de {resources[0]}</Text>
+        <HorizontalScrollPicker
+          numbers={resourcesAmount}
+          value={selectedValue}
+          onValueChange={setSelectedValue}
+          itemWidth={80}
+          selectedColor="#20b2aa"
+        />
+      </View>
+      <View style={styles.areaArea}>
+        <Text style={styles.label}>Cantidad de {resources[0]}</Text>
+        <HorizontalScrollPicker
+          numbers={resourcesAmount}
+          value={selectedValue}
+          onValueChange={setSelectedValue}
+          itemWidth={80}
+          selectedColor="#20b2aa"
+        />
+      </View> */}
+      <Modal visible={showArea} animationType="slide" transparent>
+        <View style={styles.modalOverlay} >
+          <View style={styles.modalContent} >
+            <Text style={styles.modalTitle}>Insumo</Text>
+            <View style={styles.areaArea}>
+            <HorizontalScrollPicker
+              numbers={Array.from({ length: 20 + 1 }, (_, i) => i)}
+              value={selectedValue}
+              onValueChange={setSelectedValue}
+              itemWidth={80}
+              selectedColor="#20b2aa"
+            />
+            </View>
+            
+            <Pressable onPress={() => setShowArea(false)} style={styles.closeButton}>
+              <Text style={styles.buttonText}>Cerrar</Text>
+            </Pressable>
+          </View>
+        </View>
+      </Modal>
+
+      
+
+      {/* <SideLabelWheelPicker 
         label='Tapabocas'
         items={resourcesAmount}
       />
@@ -57,7 +129,7 @@ export default function DeployedResourcesScreen() {
           label={resource}
         items={resourcesAmount}
         />
-      ))}
+      ))} */}
 
 
 
@@ -104,7 +176,7 @@ const styles = StyleSheet.create({
   },
   label: {
     fontSize: 16,
-    color: '#03826f',
+    color: '#000',
     marginTop: 20,
     marginBottom: 5,
     alignSelf: 'flex-start',
@@ -169,5 +241,33 @@ const styles = StyleSheet.create({
     borderRadius: 15,
     marginTop: 20,
     width: '30%',
+  },
+  modalOverlay: {
+    flex: 1,
+    backgroundColor: 'rgba(0,0,0,0.5)',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  modalContent: {
+    backgroundColor: 'white',
+    padding: 20,
+    borderRadius: 15,
+    width: '90%',
+    alignItems: 'center',
+  },
+  modalTitle: {
+    fontSize: 18,
+    fontWeight: 'bold',
+    marginBottom: 10,
+  },
+  areaArea: {
+    width: "100%",
+    height: 150,
+  },
+  closeButton: {
+    marginTop: 20,
+    backgroundColor: '#007bff',
+    padding: 10,
+    borderRadius: 8,
   },
 });
