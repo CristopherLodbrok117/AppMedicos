@@ -1,14 +1,13 @@
+// RedirectButton.js
 import React from "react";
-import { View } from "react-native-web";
+import { View, TouchableOpacity, Text, StyleSheet } from "react-native"; // Changed import
 import Icon from 'react-native-vector-icons/MaterialIcons';
-import { StyleSheet, TouchableOpacity, Text } from "react-native";
 import { Link } from "expo-router";
 
-
-const RedirectButton = ( {refName, iconName, } ) => {
+const RedirectButton = ({ refName, iconName }) => {
   return (
     <View style={styles.container}>
-      <Link href={`/${refName}`} asChild style={styles.link}>
+      <Link href={`/${refName}`} asChild>
         <TouchableOpacity style={styles.button}>
           <Icon name={iconName} style={styles.icon} />
           <Text style={styles.text}>Firma</Text>
@@ -18,8 +17,6 @@ const RedirectButton = ( {refName, iconName, } ) => {
   );
 }
 
-export default RedirectButton;
-
 const styles = StyleSheet.create({
   container: {
     flex: 1,
@@ -27,31 +24,24 @@ const styles = StyleSheet.create({
     justifyContent: 'flex-end',
     paddingBottom: 5,
   },
-  
-  link: {
-    justifyContent: 'center',
-    backgroundColor: 'white',
-    width: '90%',
-  },
   button: {
     flexDirection: 'row',
-    // justifyContent: 'space-around',
-    backgroundColor: '#aab',
-    paddingVertical: 5,
-    // paddingHorizontal: 10,
+    backgroundColor: '#20b2aa', // Changed to match your theme
+    paddingVertical: 8,
+    paddingHorizontal: 12,
     borderRadius: 5,
+    alignItems: 'center',
   },
   icon: {
-    // position: "absolute",
     color: "#fff",
     fontSize: 24,
-
+    marginRight: 4,
   },
   text: {
-    fontSize: 18,
-    fontWeight: 600,
+    fontSize: 16,
+    fontWeight: '600',
     color: '#fff',
-    paddingLeft: 4,
-    
   },
 });
+
+export default RedirectButton;

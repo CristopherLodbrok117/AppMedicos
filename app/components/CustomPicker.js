@@ -12,7 +12,7 @@ const CustomPicker = ({ label, selectedValue, onValueChange, options }) => {
         style={styles.picker}
       >
         {options.map((option, index) => (
-          <Picker.Item key={index} label={option} value={index} />
+          <Picker.Item key={index} label={option} value={option} />
         ))}
       </Picker>
     </View>
