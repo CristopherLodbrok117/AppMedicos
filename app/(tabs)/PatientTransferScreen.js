@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { StyleSheet, Text, TextInput, View, Image, ScrollView, Pressable } from 'react-native';
+import { Link } from "expo-router";
 
 import FloatingLabelInput from '../components/FloatingLabelInput';
 import CustomPicker from '../components/CustomPicker';
@@ -67,7 +68,7 @@ const PatientTransferScreen = () => {
 
           <View style={styles.signatureButton}>
             <RedirectButton
-              refName='SignatureTestScreen'
+              refName='(signature)/SignatureTestScreen'
               iconName='edit-square'
             />
           </View>
@@ -107,7 +108,7 @@ const PatientTransferScreen = () => {
 
           <View style={styles.signatureButton}>
             <RedirectButton
-              refName='SignatureTestScreen'
+              refName='(signature)/SignatureTestScreen'
               iconName='edit-square'
             />
           </View>
@@ -115,6 +116,7 @@ const PatientTransferScreen = () => {
 
         {/* Medico firma*/}
         <View style={styles.signature}>
+
           <View style={styles.signatureInput}>
             <FloatingLabelInput
               label='Médico que recibe'
@@ -126,10 +128,11 @@ const PatientTransferScreen = () => {
 
           <View style={styles.signatureButton}>
             <RedirectButton
-              refName='SignatureTestScreen'
+              refName='(signature)/SignatureTestScreen'
               iconName='edit-square'
             />
           </View>
+
         </View>
         
         {/* <CustomPicker 
