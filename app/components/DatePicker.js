@@ -79,6 +79,7 @@ const styles = StyleSheet.create({
     color: '#03826f',
     marginTop: 5,
     marginBottom: 5,
+    marginHorizontal: 20,
     alignSelf: 'flex-start',
     fontWeight: 'bold',
   },
@@ -87,12 +88,12 @@ const styles = StyleSheet.create({
     color: ''
   },
   dateArea: {
-    minWidth: '75%',
+    maxWidth: '75%',
     // maxHeight: 250,
     borderRadius: 10,
     backgroundColor: '#fff',
     alignSelf: 'center',
     paddingVertical: 15,
-    paddingHorizontal: 10,
+    paddingHorizontal: 15,
   },
 });

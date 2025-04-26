@@ -246,7 +246,7 @@ const styles = StyleSheet.create({
   dateArea: {
     width: '100%',
     maxHeight: 300,
-    marginVertical: 10,
+    marginVertical: 20,
   },
   saveButton: {
     backgroundColor: '#28a745',
