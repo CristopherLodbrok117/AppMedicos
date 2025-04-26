@@ -4,6 +4,7 @@ import { Picker } from '@react-native-picker/picker';
 import DateWheelPicker from '../components/DateWheelPicker';
 import FloatingLabelInput from '../components/FloatingLabelInput';
 import CustomPicker from '../components/CustomPicker';
+import DatePicker from '../components/DatePicker';
 
 // import doctorImage from './assets/doctor.png';
 
@@ -39,6 +40,9 @@ const PatientEvaluationScreen = () => {
     , 'Urogenital', 'Gineco obstétrica', 'Psico emotiva', 'Músculo esquelético', 'infecciosa', 'Oncológico'];
   const products = ['No aplica', 'Vivo', 'Muerto'];
   const genders = ['No aplica', 'Masculino', 'Femenino'];
+
+  const [lastCycleDate, setLastCycleDate] = useState(new Date(Date.now()));
+  const [birthDate, setBirthDate] = useState(new Date(Date.now()));
 
   return (
     <ScrollView contentContainerStyle={styles.container}>
@@ -124,17 +128,24 @@ const PatientEvaluationScreen = () => {
       {/* -------------------------------FECHAS ------------------------------- */}
 
       
-      <View style={styles.datePickerArea}>{
-        <DateWheelPicker 
-          title='Última fecha de menstruación'
-        />
-      }</View>
 
-      <View style={styles.datePickerArea}>{
-        <DateWheelPicker 
-          title='Fecha probable de parto'
+      <View style={styles.dateArea}>
+        <DatePicker
+          date={lastCycleDate}
+          setDate={setLastCycleDate}
+          title='Última fecha de menstruación'
+          withTime={false} // Cambiar a true para permitir modificar y mostrar hora (false para ocultarlos)
         />
-      }</View>
+      </View>
+
+      <View style={styles.dateArea}>
+        <DatePicker
+          date={birthDate}
+          setDate={setBirthDate}
+          title='Fecha probable de parto'
+          withTime={false} // Cambiar a true para permitir modificar y mostrar hora (false para ocultarlos)
+        />
+      </View>
 
       <TouchableOpacity style={styles.saveButton}>
         <Text style={styles.buttonText}>Guardar</Text>
@@ -231,6 +242,11 @@ const styles = StyleSheet.create({
     marginTop: 25,
     borderRadius: 15,
     backgroundColor: '#fff',
+  },
+  dateArea: {
+    width: '100%',
+    maxHeight: 300,
+    marginVertical: 10,
   },
   saveButton: {
     backgroundColor: '#28a745',

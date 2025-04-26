@@ -13,8 +13,11 @@ import {
 import FloatingLabelInput from '../components/FloatingLabelInput';
 import DateWheelPicker from '../components/DateWheelPicker';
 import CustomPicker from '../components/CustomPicker';
+import DatePicker from '../components/DatePicker';
 
 export default function MedicalRecordScreen() {
+  const [date, setDate] = useState(new Date(Date.now()));
+
   const [showArea, setShowArea] = useState(false);
   const [weekDay, setWeekDay] = useState('');
   const [attentionReason, setAttentionReasons] = useState('');
@@ -46,12 +49,15 @@ export default function MedicalRecordScreen() {
       <ScrollView contentContainerStyle={styles.container} nestedScrollEnabled={true}>
         <Text style={styles.title}>Expediente Médico</Text>
         <Image style={styles.image} source={require('../assets/doctor.png')} />
-        <Text style={styles.dateLabel}>Fecha: 01/02/2025</Text>
-        <Text style={styles.dateLabel}>Hora: 14:30</Text>
-
-        <TouchableOpacity style={styles.expandButton} onPress={() => setShowArea(true)}>
-          <Text style={styles.buttonText}>Cambiar fecha</Text>
-        </TouchableOpacity>
+        
+        <View style={styles.dateArea}>
+          <DatePicker
+            date={date}
+            setDate={setDate}
+            title='Fecha de hoy'
+            withTime={true} // Cambiar a true para permitir modificar y mostrar hora (false para ocultarlos)
+          />
+        </View>
 
         <Text style={styles.sectionTitle}>Ingrese los siguientes datos</Text>
 
@@ -128,6 +134,12 @@ const styles = StyleSheet.create({
     padding: 10,
     borderRadius: 8,
     marginBottom: 10,
+  },
+
+  dateArea: {
+    width: '100%',
+    maxHeight: 300,
+    marginVertical: 10,
   },
   sectionTitle: {
     fontSize: 18,
