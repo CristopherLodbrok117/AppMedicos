@@ -1,5 +1,15 @@
 import React, { useState } from 'react';
-import { View, Text, TextInput, Button, TouchableOpacity, StyleSheet, ScrollView, Image } from 'react-native';
+import { 
+  View, 
+  Text, 
+  TextInput, 
+  Button, 
+  TouchableOpacity, 
+  StyleSheet, 
+  ScrollView, 
+  Image,
+  Modal,
+  Pressable } from 'react-native';
 import { Picker } from '@react-native-picker/picker';
 import FloatingLabelInput from '../components/FloatingLabelInput';
 import CustomPicker from '../components/CustomPicker';
@@ -40,22 +50,40 @@ export default function PhysicalExplorationScreen() {
       <Image
         style={styles.image}
         source={require('../assets/doctor.png')}
-      />
+      /> 
       
-      <TouchableOpacity style={globalStyles.expandButton} onPress={() => setShowInjuries(!showInjuries)}>
-        <Text style={globalStyles.buttonText}>{showInjuries ? 'Cerrar' : 'Elegir tipo de lesión'}</Text>
+      <TouchableOpacity style={styles.expandButton} onPress={() => setShowInjuries(!showInjuries)}>
+        <Text style={styles.buttonText}>{showInjuries ? 'Cerrar' : 'Elegir tipo de lesión'}</Text>
       </TouchableOpacity>
-      {showInjuries && <View style={globalStyles.expandableArea}>{
-        <CheckListV1 
-          items={INJURIES}
-          selectedItems={selectedInjuries}
-          setSelectedItems={setSelectedInjuries}
-        />
-        }</View>}
 
-      <Text style={styles.subtitle}>Zona de lesión</Text>
+      {showInjuries && <View style={styles.expandableArea}>{
+        
+        }</View>}
+        
+      
+      <Modal visible={showInjuries} animationType="slide" transparent>
+        <View style={styles.modalOverlay} >
+          <View style={styles.modalContent} >
+            <Text style={styles.modalTitle}>Tipo de lesión</Text>
+            <View style={styles.areaArea}>
+              <CheckListV1
+                items={INJURIES}
+                selectedItems={selectedInjuries}
+                setSelectedItems={setSelectedInjuries}
+              />
+            </View>
+
+            <Pressable onPress={() => setShowInjuries(false)} style={styles.closeButton}>
+              <Text style={styles.buttonText}>Cerrar</Text>
+            </Pressable>
+          </View>
+        </View>
+      </Modal>
+
+      
 
       <View style={styles.imageArea}>
+        <Text style={styles.subtitle}>Zona de lesión</Text>
         <IconImageV1 />
       </View>
       
@@ -85,6 +113,7 @@ const styles = StyleSheet.create({
     fontSize: 18,
     fontWeight: '600',
     color: '#555',
+    marginTop: 10,
     marginBottom: 20,
     alignSelf: 'center',
   },
@@ -150,6 +179,7 @@ const styles = StyleSheet.create({
     color: 'white',
     textAlign: 'center',
     fontWeight: 'bold',
+    fontSize: 18,
   },
   expandableArea: {
     width: '100%',
@@ -173,7 +203,35 @@ const styles = StyleSheet.create({
 
   imageArea: {
     width: 500,
-    height: 300,
+    height: 450,
     backgroundColor: '#fff',
+  },
+  modalOverlay: {
+    flex: 1,
+    backgroundColor: 'rgba(0,0,0,0.5)',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  modalContent: {
+    backgroundColor: 'white',
+    padding: 20,
+    borderRadius: 15,
+    width: '90%',
+    alignItems: 'center',
+  },
+  modalTitle: {
+    fontSize: 18,
+    fontWeight: 'bold',
+    marginBottom: 10,
+  },
+  areaArea: {
+    width: "100%",
+    height: 450,
+  },
+  closeButton: {
+    marginTop: 20,
+    backgroundColor: '#007bff',
+    padding: 10,
+    borderRadius: 8,
   },
 });
