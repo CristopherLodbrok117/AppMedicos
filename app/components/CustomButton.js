@@ -7,14 +7,17 @@ const CustomButton = ({
   onPress,
   backgroundColor = '#898989',
   fontSize = 16,
-  padding = 5,
+  padding = 50,
   margin = 10,
   hoverColor = '#cacaca',
   pressColor = '#cacaca',
   disabled = false,
   icon,
   iconColor = 'white',
-  iconSize = 24
+  iconSize = 24,
+  borderRadius = 8,
+  minWidth = 0,
+  minHeight = 0,
 }) => {
   const scaleValue = new Animated.Value(1);
 
@@ -54,21 +57,26 @@ const CustomButton = ({
               paddingVertical: padding,
               paddingHorizontal: padding * 2,
               marginVertical: margin,
+              borderRadius: borderRadius,
+              minWidth: minWidth,
+              minHeight: minHeight,
             }
           ]}
         >
           <View style={styles.contentContainer}>
             {icon && (
-              <Icon 
+              <Icon
                 name={icon}
                 size={iconSize}
                 color={iconColor}
-                style={styles.icon}
+                style={[styles.icon, !title && styles.centeredIcon]}
               />
             )}
-            <Text style={[styles.text, { fontSize }]}>
-              {title}
-            </Text>
+            {title ? (
+              <Text style={[styles.text, { fontSize }]}>
+                {title}
+              </Text>
+            ) : null}
           </View>
         </Animated.View>
       )}
@@ -81,7 +89,7 @@ const CustomButton = ({
 const styles = StyleSheet.create({
   button: {
     maxWidth: 300,
-    borderRadius: 8,
+    
     alignItems: 'center',
     justifyContent: 'center',
     shadowColor: '#000',
@@ -104,6 +112,9 @@ const styles = StyleSheet.create({
   text: {
     fontWeight: '600',
     color: 'white',
+  },
+  centeredIcon: {
+    marginRight: 0,
   },
 });
 
