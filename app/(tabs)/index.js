@@ -1,131 +1,28 @@
-// import React from 'react';
-// import { StatusBar } from 'expo-status-bar';
-// import { StyleSheet, Text, View, ImageBackground } from 'react-native';
-// import CustomButton from '../components/CustomButton';
-// import { useRouter } from 'expo-router';
-
-// export default function App() {
-//   const router = useRouter();
-
-//   return (
-//     <View style={styles.container}>
-//       {/* Contenedor principal */}
-//       <View style={styles.mainContent}>
-//         {/* Imagen de encabezado */}
-//         <ImageBackground 
-//           source={require('../assets/imaeg-paramedicos.jpg')}
-//           style={styles.headerImage}
-//           resizeMode="cover"
-//         >
-//         <Text style={styles.imageTitle}>Emergencias Médicas</Text>
-        
-
-//         {/* Contenedor de botones */}
-//         <View style={styles.buttonsContainer}>
-//           <CustomButton
-//             title="" // Texto vacío
-//             onPress={() => router.push('/(tabs)/MedicalRecordScreen')}
-//             backgroundColor="#007AFF"
-//             icon="add" // Icono de +
-//             iconColor="white"
-//             iconSize={32}
-//             padding={20}
-//             style={styles.iconButton}
-//           />
-//           <CustomButton
-//             title="Historial"
-//             onPress={() => router.push('/(tabs)/protocolos')}
-//             backgroundColor="#343434"
-//             fontSize={18}
-//             padding={15}
-//           />
-//           <CustomButton
-//             title="Pendientes"
-//             onPress={() => router.push('/(tabs)/recursos')}
-//             backgroundColor="#787878"
-//             fontSize={18}
-//             padding={15}
-//           />
-//         </View>
-//         </ImageBackground>
-//       </View>
-      
-//       <StatusBar style="auto" />
-//     </View>
-//   );
-// }
-
-// const styles = StyleSheet.create({
-//   container: {
-//     flex: 1,
-//     backgroundColor: '#f5f5f5',
-//   },
-//   mainContent: {
-//     flex: 1,
-//     backgroundColor: '#fff',
-//   },
-//   headerImage: {
-//     width: '100%',
-//     height: '100%',
-//     justifyContent: 'flex-end',
-//     backgroundColor: 'rgba(0,0,0,0.5)',
-//   },
-//   imageTitle: {
-//     fontSize: 28,
-//     fontWeight: 'bold',
-//     color: 'white',
-//     padding: 20,
-//     backgroundColor: 'rgba(0,0,0,0.5)',
-//     width: '100%',
-//     position: 'absolute',
-//     top: 0,
-    
-//   },
-//   buttonsContainer: {
-    
-//     width: 400,
-//     height: 600,
-//     backgroundColor: '#fff',
-//     justifyContent: 'center',
-//     padding: 30,
-//   },
-//   title: {
-//     fontSize: 24,
-//     fontWeight: 'bold',
-//     color: '#333',
-//     marginBottom: 10,
-    
-//   },
-//   description: {
-//     fontSize: 16,
-//     textAlign: 'center',
-//     color: '#666',
-//   },
-//   buttonsContainer: {
-//     minWidth: '40%',
-//     alignSelf: 'center',
-//     justifyContent: 'center',
-//     padding: 30,
-//     gap: 20, // Espacio entre botones
-
-//   },
-//   iconButton: {
-//     aspectRatio: 1, // Para mantener forma cuadrada
-//     borderRadius: 50, // Hace el botón circular
-//     alignSelf: 'center', // Centra el botón
-//   },
-// });
-
-
 
 import React from 'react';
 import { StyleSheet, Text, View, ImageBackground, TouchableOpacity } from 'react-native';
 import { StatusBar } from 'expo-status-bar';
 import CustomButton from '../components/CustomButton';
 import { useRouter } from 'expo-router';
+import { Alert } from 'react-native';
+import useCreateRecord from '../hooks/useCreateRecord';
 
 export default function App() {
   const router = useRouter();
+
+  const { createRecord, isLoading, error } = useCreateRecord();
+
+  const handleCreate = async () => {
+    try {
+      await createRecord(); // Usa el valor por defecto { id: 1 }
+    } catch {
+      Alert.alert(
+        'Error', 
+        error || 'No se pudo crear el registro médico',
+        [{ text: 'OK', onPress: () => {} }]
+      );
+    }
+  };
 
   return (
     <View style={styles.container}>
@@ -146,9 +43,10 @@ export default function App() {
           <View style={styles.panel}>
             <CustomButton
               title="" // Texto vacío
-              onPress={() => router.push('/(tabs)/MedicalRecordScreen')}
+              onPress={handleCreate}
               backgroundColor="#20b2aa"
-              icon="add" // Icono de +
+              disabled={isLoading}
+              icon={isLoading ? "autorenew" : "add"}
               iconColor="white"
               iconSize={80}
               padding={0}

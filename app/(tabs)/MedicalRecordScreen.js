@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   View,
   Text,
@@ -14,8 +14,13 @@ import FloatingLabelInput from '../components/FloatingLabelInput';
 import DateWheelPicker from '../components/DateWheelPicker';
 import CustomPicker from '../components/CustomPicker';
 import DatePicker from '../components/DatePicker';
+import { useLocalSearchParams } from 'expo-router';
+import apiClient from '../api/client';
 
 export default function MedicalRecordScreen() {
+  const params = useLocalSearchParams();
+  const location = decodeURIComponent(params.location);
+
   const [date, setDate] = useState(new Date(Date.now()));
 
   const [showArea, setShowArea] = useState(false);
@@ -43,6 +48,21 @@ export default function MedicalRecordScreen() {
   const operators = ['Javier Iñiguez', 'Rodrigo Guitierrez', 'Yair Villagrana', 'Jesús Hernandez', 'Jaime Juárez', 'Aida García'];
   const interns = operators;
   const genders = ['Masculino', 'Femenino'];
+
+  useEffect(() => {
+    const fetchRecordData = async () => {
+      try {
+        const response = await apiClient.get(location);
+        console.log('Datos del registro:', response.data);
+      } catch (error) {
+        console.error('Error fetching record:', error);
+      }
+    };
+
+    if (location) {
+      fetchRecordData();
+    }
+  }, [location]);
 
   return (
     <View style={{ flex: 1 }}>
