@@ -8,71 +8,60 @@ import {
   Image,
   Modal,
   Pressable, } from 'react-native';
-import { Picker } from '@react-native-picker/picker';
-import FloatingLabelInput from '../components/FloatingLabelInput';
-import CustomPicker from '../components/CustomPicker';
-import DateWheelPicker from '../components/DateWheelPicker';
-import SideLabelWheelPicker from '../components/SideLabelWheelPicker';
 
-// import CustomWheelPicker from './components/CustomWheelPicker';
-import MyWheelPicker from '../components/MyWheelPicker';
-import TopLabelWheelPicker from '../components/TopLabelWheelPicker';
 import HorizontalScrollPicker from '../components/HorizontalScrollPicker';
-import Resource from '../components/Resource';
+import CustomButton from './CustomButton';
 
-export default function DeployedResourcesScreen() {
+export default function Resource({name}) {
   const [showArea, setShowArea] = useState(false);
-  const [vehicleType, setVehicleType] = useState('');
 
-  const [vehicleNum, setVehicleNum] = useState('');
-
-  const [evaluationItem, setEvaluationItem] = useState('');
-  
-
-  const resources = ['Agua inyectable 500ml', 'Agua oxigenada', 'Agujas 20x32', 'Algodón paquete'
-    , 'Bata desechable', 'Bolsa negra', 'Bolsa roja', 'Bolsa amarilla', 'Bum free gel', 'Campos estériles'
-    , 'Cánula blanda de aspiración', 'Cánulas nasofaringeas', 'Cánulas orofaringeas', 'Cánula Yankawer'
-    , 'Catéter #12', 'Catéter #14', 'Catéter #16', 'Catéter #18', 'Catéter #20', 'Catéter #22', 'Catéter #24'
-    , 'Cinta Transporte 3m 1', 'Cinta Transporte 3m 2', 'Collarines desechables', 'Cubrebocas'
-    , 'Desinfectante para manos' , 'Desinfectante para superficies', 'Fijador de TE adulto'
-    , 'Fijador de TE pediátrico', 'Gasas estériles', 'Gasas no estériles'];
-
-  const resourcesAmount = Array.from({ length: 101 }, (_, index) => index);
   
   const [selectedValue, setSelectedValue] = useState(0);
 
-  
-
   return (
-    <ScrollView contentContainerStyle={styles.container}
+    <View contentContainerStyle={styles.container}>
 
-      keyboardShouldPersistTaps="handled"
-      horizontal={false}
-      nestedScrollEnabled={true}>
-
-      <Text style={styles.title}>Recursos Utilizados</Text>
-      
-      
-
-      <Image
-        style={styles.image}
-        source={require('../assets/doctor.png')}
+      <CustomButton
+        title={name}
+        onPress={() => setShowArea(true)}
+        fontSize={18}
+        padding={9}
+        icon="medication" // Icon name from MaterialIcons
+        iconColor="white"
+        iconSize={24}
       />
-      
-      <Text style={styles.subtitle}>Arrastre para seleccionar la cantidad de insumos</Text>
 
+      <Modal visible={showArea} animationType="slide" transparent>
+        <View style={styles.modalOverlay} >
+          <View style={styles.modalContent} >
+            
+            <Text style={styles.modalTitle}>{name}</Text>
+            
+            <View style={styles.areaArea}>
+            <HorizontalScrollPicker
+              numbers={Array.from({ length: 20 + 1 }, (_, i) => i)}
+              value={selectedValue}
+              onValueChange={setSelectedValue}
+              itemWidth={80}
+              selectedColor="#20b2aa"
+            />
+            </View>
+            
+            <CustomButton
+              title='Cerrar'
+              onPress={() => setShowArea(false)}
+              fontSize={18}
+              padding={9}
+              icon="medication" // Icon name from MaterialIcons
+              iconColor="white"
+              iconSize={24}
+            />
+          </View>
 
-      {resources.map((resource, index) => (
-        <Resource key={index}
-          name={resource}
-        />
-      ))} 
+        </View>
+      </Modal>
 
-      <TouchableOpacity style={styles.saveButton}>
-        <Text style={styles.buttonText}>Guardar</Text>
-      </TouchableOpacity>
-      
-    </ScrollView>
+    </View>
   );
 }
 
