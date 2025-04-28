@@ -19,11 +19,13 @@ import apiClient from '../api/client';
 
 export default function MedicalRecordScreen() {
   const params = useLocalSearchParams();
+  
   const location = decodeURIComponent(params.location);
 
   const [date, setDate] = useState(new Date(Date.now()));
 
   const [showArea, setShowArea] = useState(false);
+
   const [weekDay, setWeekDay] = useState('');
   const [attentionReason, setAttentionReasons] = useState('');
   const [serviceLocation, setServiceLocation] = useState('');
@@ -49,11 +51,18 @@ export default function MedicalRecordScreen() {
   const interns = operators;
   const genders = ['Masculino', 'Femenino'];
 
+  const splitted = location.split('/');
+  const recordId = splitted[splitted.length - 1];
+
+  // const [recordId, setRecordId] = useState(0);
+  
+
   useEffect(() => {
     const fetchRecordData = async () => {
       try {
         const response = await apiClient.get(location);
         console.log('Datos del registro:', response.data);
+        // setRecordId(response.data.id);
       } catch (error) {
         console.error('Error fetching record:', error);
       }
@@ -63,6 +72,45 @@ export default function MedicalRecordScreen() {
       fetchRecordData();
     }
   }, [location]);
+
+  const handleSave = async () => {
+    console.log("Guardando");
+    const { updateRecord, loading, error } = useUpdateRecord();
+
+    const body = {
+
+      'date': date.toISOString(),
+      // 'weekDay': weekDay,
+      'attentionReason': attentionReason,
+      'serviceLocation': serviceLocation,
+      'vehicleType': vehicleType,
+      'vehicleNum': vehicleNum,
+      'operator': operator,
+      'intern': intern,
+      'moreInterns': moreInterns,
+      'affiliation': affiliation,
+      'gender': gender,
+      'age': age,
+      'address': address,
+      'colony': colony,
+      'municipality': municipality,
+      'phone': phone,
+      'rightful': rightful,
+      'patient': {
+        'id': recordId
+      }
+
+    }
+
+    try {
+      alert(`ID de paciente ${recordId}`);
+      
+      await updateRecord(recordId, body);
+      alert('Registro actualizado exitosamente!');
+    } catch (err) {
+      alert(err.response?.data);
+    }
+  };
 
   return (
     <View style={{ flex: 1 }}>
@@ -101,7 +149,7 @@ export default function MedicalRecordScreen() {
         <FloatingLabelInput label="Teléfono" iconName="phone-android" value={phone} onChangeText={setPhone} />
         <FloatingLabelInput label="Derechohabiente a" iconName="person-add-alt" value={rightful} onChangeText={setRightful} />
 
-        <TouchableOpacity style={styles.saveButton}>
+        <TouchableOpacity style={styles.saveButton} onPress={handleSave}>
           <Text style={styles.buttonText}>Guardar</Text>
         </TouchableOpacity>
       </ScrollView>

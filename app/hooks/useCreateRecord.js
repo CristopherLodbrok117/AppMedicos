@@ -14,11 +14,14 @@ const useCreateRecord = () => {
       
       const response = await apiClient.post('/api/patients', postData);
       
+
       const location = response.headers.location;
       if (location) {
         router.push({
           pathname: '/(tabs)/MedicalRecordScreen',
-          params: { location: encodeURIComponent(location) }
+          params: { 
+            location: encodeURIComponent(location)
+          }
         });
       }
 
@@ -26,6 +29,7 @@ const useCreateRecord = () => {
     } catch (err) {
       setError(err.response?.data?.message || 'Error desconocido');
       throw err;
+      
     } finally {
       setIsLoading(false);
     }
