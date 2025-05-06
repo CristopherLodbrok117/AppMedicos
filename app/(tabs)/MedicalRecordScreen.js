@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   View,
   Text,
@@ -9,15 +9,17 @@ import {
   Image,
   Modal,
   Pressable,
+  Alert,
 } from 'react-native';
 import FloatingLabelInput from '../components/FloatingLabelInput';
 import DateWheelPicker from '../components/DateWheelPicker';
 import CustomPicker from '../components/CustomPicker';
 import DatePicker from '../components/DatePicker';
 
+import { initDatabase, insertRecord } from '../../services/database';
+
 export default function MedicalRecordScreen() {
   const [date, setDate] = useState(new Date(Date.now()));
-
   const [showArea, setShowArea] = useState(false);
   const [weekDay, setWeekDay] = useState('');
   const [attentionReason, setAttentionReasons] = useState('');
@@ -36,13 +38,54 @@ export default function MedicalRecordScreen() {
   const [phone, setPhone] = useState('');
   const [rightful, setRightful] = useState('');
 
-  const weekDays = ['Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado', 'Domingo'];
-  const attentionReasons = ['Enfermedad', 'Traumatismo', 'Gineco obstétrico'];
-  const serviceLocations = ['Cucei', 'Inst. Dep.', 'Politécnico', 'Vocacional', 'Prepa 12', 'Via pública'];
-  const vehicleTypes = ['Vehiculo oficial', 'Cuatrimoto', 'Ambulancia', 'Ambulancia eléctrica', 'Otro'];
-  const operators = ['Javier Iñiguez', 'Rodrigo Guitierrez', 'Yair Villagrana', 'Jesús Hernandez', 'Jaime Juárez', 'Aida García'];
+  const weekDays = ['Lunes','Martes','Miércoles','Jueves','Viernes','Sábado','Domingo'];
+  const attentionReasons = ['Enfermedad','Traumatismo','Gineco obstétrico'];
+  const serviceLocations = ['Cucei','Inst. Dep.','Politécnico','Vocacional','Prepa 12','Via pública'];
+  const vehicleTypes = ['Vehiculo oficial','Cuatrimoto','Ambulancia','Ambulancia eléctrica','Otro'];
+  const operators = ['Javier Iñiguez','Rodrigo Guitierrez','Yair Villagrana','Jesús Hernandez','Jaime Juárez','Aida García'];
   const interns = operators;
-  const genders = ['Masculino', 'Femenino'];
+  const genders = ['Masculino','Femenino'];
+
+  useEffect(() => {
+    initDatabase().catch(err => console.error(err));
+  }, []);
+
+  const saveRecord = async (statusLabel) => {
+    const dateStr = date.toISOString().split('T')[0];
+    const timeStr = date.toTimeString().split(' ')[0];
+
+    const record = {
+      date: dateStr,
+      time: timeStr,
+      weekDay,
+      attentionReason,
+      serviceLocation,
+      vehicleType,
+      vehicleNum,
+      operator,
+      intern,
+      moreInterns,
+      affiliation,
+      gender,
+      age,
+      address,
+      colony,
+      municipality,
+      phone,
+      rightful,
+    };
+
+    try {
+      const id = await insertRecord(record, statusLabel);
+      Alert.alert(
+        statusLabel === 'saved' ? 'Guardado' : 'Guardado como pendiente',
+        `Expediente ID: ${id}`
+      );
+    } catch (err) {
+      console.error(err);
+      Alert.alert('Error', 'No se pudo guardar el expediente');
+    }
+  };
 
   return (
     <View style={{ flex: 1 }}>
@@ -55,7 +98,7 @@ export default function MedicalRecordScreen() {
             date={date}
             setDate={setDate}
             title='Fecha de hoy'
-            withTime={true} // Cambiar a true para permitir modificar y mostrar hora (false para ocultarlos)
+            withTime={true}
           />
         </View>
 
@@ -81,12 +124,14 @@ export default function MedicalRecordScreen() {
         <FloatingLabelInput label="Teléfono" iconName="phone-android" value={phone} onChangeText={setPhone} />
         <FloatingLabelInput label="Derechohabiente a" iconName="person-add-alt" value={rightful} onChangeText={setRightful} />
 
-        <TouchableOpacity style={styles.saveButton}>
+        <TouchableOpacity style={styles.saveButton} onPress={() => saveRecord('saved')}>
           <Text style={styles.buttonText}>Guardar</Text>
+        </TouchableOpacity>
+        <TouchableOpacity style={styles.pendingButton} onPress={() => saveRecord('pending')}>
+          <Text style={styles.buttonText}>Terminar más tarde</Text>
         </TouchableOpacity>
       </ScrollView>
 
-      {/* Modal con WheelPicker */}
       <Modal visible={showArea} animationType="slide" transparent>
         <View style={styles.modalOverlay}>
           <View style={styles.modalContent}>
@@ -106,7 +151,7 @@ const styles = StyleSheet.create({
   container: {
     padding: 20,
     alignItems: 'center',
-    backgroundColor: 'f5f5f5',
+    backgroundColor: '#f5f5f5',
   },
   title: {
     fontSize: 24,
@@ -121,21 +166,6 @@ const styles = StyleSheet.create({
     resizeMode: 'cover',
     alignSelf: 'center',
   },
-  dateLabel: {
-    fontSize: 16,
-    color: '#03826f',
-    marginTop: 5,
-    marginBottom: 5,
-    alignSelf: 'flex-start',
-    fontWeight: 'bold',
-  },
-  expandButton: {
-    backgroundColor: '#007bff',
-    padding: 10,
-    borderRadius: 8,
-    marginBottom: 10,
-  },
-
   dateArea: {
     width: '100%',
     maxHeight: 300,
@@ -152,6 +182,13 @@ const styles = StyleSheet.create({
     padding: 10,
     borderRadius: 8,
     marginTop: 20,
+    width: '100%',
+  },
+  pendingButton: {
+    backgroundColor: '#6c757d',
+    padding: 10,
+    borderRadius: 8,
+    marginTop: 10,
     width: '100%',
   },
   buttonText: {

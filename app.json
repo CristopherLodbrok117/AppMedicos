@@ -19,7 +19,8 @@
       "adaptiveIcon": {
         "foregroundImage": "./app/assets/adaptive-icon.png",
         "backgroundColor": "#ffffff"
-      }
+      },
+      "package": "com.anonymous.appMedicos"
     },
     "web": {
       "favicon": "./app/assets/favicon.png"
