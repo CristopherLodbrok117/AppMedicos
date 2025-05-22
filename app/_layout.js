@@ -1,28 +1,33 @@
-import { Stack } from "expo-router";
-import { View, StyleSheet } from "react-native";
-import SideNavigationBar from "./components/SideNavigationBar";
+// app/_layout.js
+import React from 'react';
+import { Stack } from 'expo-router';
 
-export default function Layout() {
+export default function RootLayout() {
   return (
     <Stack>
-      <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
+      {/* 1) Tu grupo de pestañas */}
+      <Stack.Screen
+        name="(tabs)"
+        options={{ headerShown: false }}
+      />
+
+      {/* 2) Historial (fuera de las tabs) */}
+      <Stack.Screen
+        name="protocolos"
+        options={{
+          title: 'Historial',
+          headerTitleAlign: 'center',
+        }}
+      />
+
+      {/* 3) Pendientes (fuera de las tabs) */}
+      <Stack.Screen
+        name="recursos"
+        options={{
+          title: 'Pendientes',
+          headerTitleAlign: 'center',
+        }}
+      />
     </Stack>
-    // <View style={styles.container}>
-    //   <SideNavigationBar />
-    //   <View style={styles.content}>
-    //     <Stack />
-    //   </View>
-    // </View>
   );
 }
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    flexDirection: "row",
-  },
-  content: {
-    flex: 1,
-    padding: 20,
-  },
-});

@@ -1,154 +1,70 @@
-// import React from 'react';
-// import { StatusBar } from 'expo-status-bar';
-// import { StyleSheet, Text, View, ImageBackground } from 'react-native';
-// import CustomButton from '../components/CustomButton';
-// import { useRouter } from 'expo-router';
-
-// export default function App() {
-//   const router = useRouter();
-
-//   return (
-//     <View style={styles.container}>
-//       {/* Contenedor principal */}
-//       <View style={styles.mainContent}>
-//         {/* Imagen de encabezado */}
-//         <ImageBackground 
-//           source={require('../assets/imaeg-paramedicos.jpg')}
-//           style={styles.headerImage}
-//           resizeMode="cover"
-//         >
-//         <Text style={styles.imageTitle}>Emergencias Médicas</Text>
-        
-
-//         {/* Contenedor de botones */}
-//         <View style={styles.buttonsContainer}>
-//           <CustomButton
-//             title="" // Texto vacío
-//             onPress={() => router.push('/(tabs)/MedicalRecordScreen')}
-//             backgroundColor="#007AFF"
-//             icon="add" // Icono de +
-//             iconColor="white"
-//             iconSize={32}
-//             padding={20}
-//             style={styles.iconButton}
-//           />
-//           <CustomButton
-//             title="Historial"
-//             onPress={() => router.push('/(tabs)/protocolos')}
-//             backgroundColor="#343434"
-//             fontSize={18}
-//             padding={15}
-//           />
-//           <CustomButton
-//             title="Pendientes"
-//             onPress={() => router.push('/(tabs)/recursos')}
-//             backgroundColor="#787878"
-//             fontSize={18}
-//             padding={15}
-//           />
-//         </View>
-//         </ImageBackground>
-//       </View>
-      
-//       <StatusBar style="auto" />
-//     </View>
-//   );
-// }
-
-// const styles = StyleSheet.create({
-//   container: {
-//     flex: 1,
-//     backgroundColor: '#f5f5f5',
-//   },
-//   mainContent: {
-//     flex: 1,
-//     backgroundColor: '#fff',
-//   },
-//   headerImage: {
-//     width: '100%',
-//     height: '100%',
-//     justifyContent: 'flex-end',
-//     backgroundColor: 'rgba(0,0,0,0.5)',
-//   },
-//   imageTitle: {
-//     fontSize: 28,
-//     fontWeight: 'bold',
-//     color: 'white',
-//     padding: 20,
-//     backgroundColor: 'rgba(0,0,0,0.5)',
-//     width: '100%',
-//     position: 'absolute',
-//     top: 0,
-    
-//   },
-//   buttonsContainer: {
-    
-//     width: 400,
-//     height: 600,
-//     backgroundColor: '#fff',
-//     justifyContent: 'center',
-//     padding: 30,
-//   },
-//   title: {
-//     fontSize: 24,
-//     fontWeight: 'bold',
-//     color: '#333',
-//     marginBottom: 10,
-    
-//   },
-//   description: {
-//     fontSize: 16,
-//     textAlign: 'center',
-//     color: '#666',
-//   },
-//   buttonsContainer: {
-//     minWidth: '40%',
-//     alignSelf: 'center',
-//     justifyContent: 'center',
-//     padding: 30,
-//     gap: 20, // Espacio entre botones
-
-//   },
-//   iconButton: {
-//     aspectRatio: 1, // Para mantener forma cuadrada
-//     borderRadius: 50, // Hace el botón circular
-//     alignSelf: 'center', // Centra el botón
-//   },
-// });
-
-
-
-import React from 'react';
-import { StyleSheet, Text, View, ImageBackground, TouchableOpacity } from 'react-native';
+// app/(tabs)/index.js
+import React, { useState, useCallback } from 'react';
+import {
+  View,
+  StyleSheet,
+  ImageBackground,
+  Text,
+  Alert,
+} from 'react-native';
 import { StatusBar } from 'expo-status-bar';
 import CustomButton from '../components/CustomButton';
 import { useRouter } from 'expo-router';
+import { useFocusEffect } from '@react-navigation/native';
+import { getPendingRecords, setSessionRecordId } from '../../services/database';
 
-export default function App() {
+export default function Home() {
   const router = useRouter();
+  const [pending, setPending] = useState([]);
+
+  useFocusEffect(useCallback(() => {
+    getPendingRecords().then(setPending).catch(console.error);
+  }, []));
+
+  function handleAdd() {
+    if (pending.length > 0) {
+      Alert.alert(
+        'Tienes un expediente pendiente',
+        `ID: ${pending[0].id}\n¿Continuar o crear uno nuevo?`,
+        [
+          {
+            text: 'Continuar',
+            onPress: () =>
+              router.push(`/MedicalRecordScreen?recordId=${pending[0].id}`),
+          },
+          {
+            text: 'Nuevo',
+            onPress: () => {
+              // liberamos sesión y navegamos sin recordId
+              setSessionRecordId(null);
+              router.push('/MedicalRecordScreen');
+            },
+          },
+          { text: 'Cancelar', style: 'cancel' },
+        ]
+      );
+    } else {
+      // liberamos sesión y navegamos
+      setSessionRecordId(null);
+      router.push('/MedicalRecordScreen');
+    }
+  }
 
   return (
     <View style={styles.container}>
-      {/* Imagen de fondo */}
       <ImageBackground
-        source={require('../assets/image-paramedicos.jpg')} // Asegúrate de tener una imagen aquí
+        source={require('../assets/image-paramedicos.jpg')}
         style={styles.background}
         resizeMode="cover"
       >
-        {/* Capa de oscurecimiento */}
         <View style={styles.overlay} />
-
-        {/* Contenido encima */}
         <View style={styles.content}>
           <Text style={styles.title}>Paramédicos CUCEI</Text>
-
-          {/* Panel de botones */}
           <View style={styles.panel}>
             <CustomButton
-              title="" // Texto vacío
-              onPress={() => router.push('/(tabs)/MedicalRecordScreen')}
+              onPress={handleAdd}
               backgroundColor="#20b2aa"
-              icon="add" // Icono de +
+              icon="add"
               iconColor="white"
               iconSize={80}
               padding={0}
@@ -157,10 +73,9 @@ export default function App() {
               minWidth={120}
               minHeight={120}
             />
-
             <CustomButton
               title="Historial"
-              onPress={() => router.push('/(tabs)/protocolos')}
+              onPress={() => router.push('/protocolos')}
               backgroundColor="#343434"
               fontSize={18}
               padding={15}
@@ -168,7 +83,7 @@ export default function App() {
             />
             <CustomButton
               title="Pendientes"
-              onPress={() => router.push('/(tabs)/recursos')}
+              onPress={() => router.push('/recursos')}
               backgroundColor="#787878"
               fontSize={18}
               padding={15}
@@ -177,67 +92,25 @@ export default function App() {
           </View>
         </View>
       </ImageBackground>
-
-      {/* Barra de estado */}
       <StatusBar style="dark" />
     </View>
   );
 }
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-  },
-  background: {
-    flex: 1,
-    width: '100%',
-    height: '100%',
-    justifyContent: 'center',
-  },
-  overlay: {
-    ...StyleSheet.absoluteFillObject, // Ocupa todo el espacio
-    backgroundColor: 'rgba(0, 160, 0, 0.1)', // Negro con 40% de opacidad
-  },
-  content: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    paddingHorizontal: 20,
-  },
+  container: { flex: 1 },
+  background: { flex: 1, width: '100%', height: '100%', justifyContent: 'center' },
+  overlay: { ...StyleSheet.absoluteFillObject, backgroundColor: 'rgba(0,0,0,0.1)' },
+  content: { flex: 1, justifyContent: 'center', alignItems: 'center', paddingHorizontal: 20 },
   title: {
-    fontSize: 40,
-    color: 'white',
-    fontWeight: 'bold',
-    marginTop: 170,
-    backgroundColor: 'rgba(0, 0, 0, 0.5)',
-    paddingVertical: 15,
-    paddingHorizontal: 15,
-    borderRadius: 30,
-    textAlign: 'center',
+    fontSize: 40, color: 'white', fontWeight: 'bold',
+    marginTop: 170, backgroundColor: 'rgba(0,0,0,0.5)',
+    paddingVertical: 15, paddingHorizontal: 15, borderRadius: 30, textAlign: 'center',
   },
   panel: {
-    width: '50%',
-    
-    backgroundColor: 'rgba(255, 255, 255, 0.9)', // Blanco semitransparente
-    borderRadius: 20,
-    borderWidth: 4,
-    borderColor: 'rgba(0, 0, 0, 0.5)',
-    padding: 20,
-    marginTop: 'auto', // Empuja el panel hacia abajo
-    marginBottom: 40, // Separación del borde inferior
-    alignItems: 'center',
+    width: '50%', backgroundColor: 'rgba(255,255,255,0.9)',
+    borderRadius: 20, borderWidth: 4, borderColor: 'rgba(0,0,0,0.5)',
+    padding: 20, marginTop: 'auto', marginBottom: 40, alignItems: 'center',
   },
-  button: {
-    backgroundColor: '#007BFF',
-    width: '100%',
-    paddingVertical: 15,
-    borderRadius: 10,
-    marginBottom: 15,
-    alignItems: 'center',
-  },
-  buttonText: {
-    color: 'white',
-    fontSize: 18,
-    fontWeight: 'bold',
-  },
+  iconButton: { aspectRatio: 1, borderRadius: 50, alignSelf: 'center' },
 });
