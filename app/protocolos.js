@@ -9,7 +9,7 @@ import {
   ActivityIndicator,
 } from 'react-native';
 import { useRouter } from 'expo-router';
-import { getSavedRecords } from '../services/database';
+import { getSavedRecords, setSessionRecordId } from '../services/database';
 
 export default function ProtocolosScreen() {
   const router = useRouter();
@@ -25,6 +25,7 @@ export default function ProtocolosScreen() {
 
   if (loading)
     return <ActivityIndicator style={styles.center} size="large" color="#20b2aa" />;
+
   if (records.length === 0)
     return (
       <View style={styles.center}>
@@ -40,12 +41,15 @@ export default function ProtocolosScreen() {
       renderItem={({ item }) => (
         <TouchableOpacity
           style={styles.item}
-          onPress={() =>
+          onPress={() => {
+            // fijamos en sesión este ID para que todas las pantallas lo lean
+            setSessionRecordId(item.id);
+            // navegamos al flujo de edición empezando en MedicalRecordScreen
             router.push({
               pathname: '/(tabs)/MedicalRecordScreen',
               params: { recordId: item.id },
-            })
-          }
+            });
+          }}
         >
           <Text style={styles.itemText}>
             ID {item.id} – {item.date} {item.time}

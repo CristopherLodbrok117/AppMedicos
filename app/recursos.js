@@ -9,7 +9,7 @@ import {
   ActivityIndicator,
 } from 'react-native';
 import { useRouter } from 'expo-router';
-import { getPendingRecords } from '../services/database';
+import { getPendingRecords, setSessionRecordId } from '../services/database';
 
 export default function RecursosScreen() {
   const router = useRouter();
@@ -25,6 +25,7 @@ export default function RecursosScreen() {
 
   if (loading)
     return <ActivityIndicator style={styles.center} size="large" color="#20b2aa" />;
+
   if (records.length === 0)
     return (
       <View style={styles.center}>
@@ -40,12 +41,15 @@ export default function RecursosScreen() {
       renderItem={({ item }) => (
         <TouchableOpacity
           style={styles.item}
-          onPress={() =>
+          onPress={() => {
+            // fijamos en sesión este ID para que todas las pantallas lo vean
+            setSessionRecordId(item.id);
+            // navegamos a la pantalla de inicio del flujo
             router.push({
               pathname: '/(tabs)/MedicalRecordScreen',
               params: { recordId: item.id },
-            })
-          }
+            });
+          }}
         >
           <Text style={styles.itemText}>
             ID {item.id} – {item.date} {item.time}
