@@ -20,6 +20,7 @@ import {
   updateFirstEvaluation,
   updateRecord,
   getFirstEvaluationById,
+  getRecordById,            // ← para leer status y bloquear si es 'saved'
   getSessionRecordId,
   setSessionRecordId
 } from '../../services/database';
@@ -30,7 +31,11 @@ export default function FirstEvaluationScreen() {
   const router = useRouter();
 
   const sessionId = getSessionRecordId();
-  const [recordId, setRecordId] = useState(paramId || sessionId);
+  const [recordId, setRecordId] = useState(paramId || sessionId || null);
+
+  // Estado del expediente (para bloqueo)
+  const [status, setStatus] = useState('pending');
+  const isLocked = status === 'saved';
 
   // Campos de primera evaluación
   const [evaluationItem, setEvaluationItem]             = useState('');
@@ -56,9 +61,7 @@ export default function FirstEvaluationScreen() {
   ];
   const circulationItems = ['No aplica','Carotideo','Radial','Paro cardiorespiratorio'];
   const airRouteItems    = ['No aplica','Permeable','Comprometida'];
-  const respSoundsItems  = [
-    'No aplica','Ruidos normales','Ruidos disminuidos','Ruidos ausentes'
-  ];
+  const respSoundsItems  = ['No aplica','Ruidos normales','Ruidos disminuidos','Ruidos ausentes'];
   const lungSideItems    = ['No aplica','Derecho','Izquierdo','Ambos'];
   const lungPartItems    = ['No aplica','Apical','Base','Ambos'];
   const qualityItems     = ['No aplica','Rápido','Lento','Rítmico','Arítmico'];
@@ -66,7 +69,39 @@ export default function FirstEvaluationScreen() {
   const skinItems        = ['No aplica','Pálida','Cianótica'];
   const characteristicsItems = ['No aplica','Eutérmica','Caliente','Fría','Diaforesis'];
 
+  // Defaults visuales y para guardado (si no tocan los pickers)
+  const computeDefaults = () => ({
+    evaluationItem: 'No aplica',
+    ventilationItem: 'No aplica',
+    circulationItem: 'No aplica',
+    airRouteItem: 'No aplica',
+    respSoundsItem: 'No aplica',
+    lungSideItem: 'No aplica',
+    lungPartItem: 'No aplica',
+    qualityItem: 'No aplica',
+    swallowingReflexItem: 'No aplica',
+    skinItem: 'No aplica',
+    characteristicsItem: 'No aplica',
+  });
+  const coalesce = (val, def) => (val !== undefined && val !== null && val !== '' ? val : def);
+
+  const applyDefaultsToUI = () => {
+    const DEF = computeDefaults();
+    setEvaluationItem(DEF.evaluationItem);
+    setVentilationItem(DEF.ventilationItem);
+    setCirculationItem(DEF.circulationItem);
+    setAirRouteItem(DEF.airRouteItem);
+    setRespSoundsItem(DEF.respSoundsItem);
+    setLungSideItem(DEF.lungSideItem);
+    setLungPartItem(DEF.lungPartItem);
+    setQualityItem(DEF.qualityItem);
+    setSwallowingReflexItem(DEF.swallowingReflexItem);
+    setSkinItem(DEF.skinItem);
+    setCharacteristicsItem(DEF.characteristicsItem);
+  };
+
   const clearForm = () => {
+    // Limpiar y dejar que luego setee defaults visuales
     setEvaluationItem('');
     setVentilationItem('');
     setCirculationItem('');
@@ -79,41 +114,62 @@ export default function FirstEvaluationScreen() {
     setSkinItem('');
     setCharacteristicsItem('');
     setRecordId(null);
+    setStatus('pending');
   };
 
   // Limpia al pulsar “Nuevo” en index (sessionId → null)
   useFocusEffect(useCallback(() => {
-    if (getSessionRecordId() === null) {
+    if (getSessionRecordId() === null && paramId === null) {
       clearForm();
+      // Defaults visibles para nuevo formulario
+      applyDefaultsToUI();
     }
-  }, [sessionId]));
+  }, [paramId]));
 
   // Inicializa BD y carga datos previos si existe ID
   useEffect(() => {
     (async () => {
       await initDatabase();
       const id = paramId || getSessionRecordId();
-      if (!id) return;
+      if (!id) {
+        // si no hay ID pero la UI quedó vacía, muestra defaults
+        if (!evaluationItem) applyDefaultsToUI();
+        return;
+      }
       setRecordId(id);
       await createAllStubs(id);
+
+      // Lee status para bloqueo
+      const rec = await getRecordById(id);
+      if (rec) setStatus(rec.status || 'pending');
+
       const prev = await getFirstEvaluationById(id);
-      if (!prev) return;
-      setEvaluationItem(prev.evaluationItem           || '');
-      setVentilationItem(prev.ventilationItem         || '');
-      setCirculationItem(prev.circulationItem         || '');
-      setAirRouteItem(prev.airRouteItem               || '');
-      setRespSoundsItem(prev.respSoundsItem           || '');
-      setLungSideItem(prev.lungSideItem               || '');
-      setLungPartItem(prev.lungPartItem               || '');
-      setQualityItem(prev.qualityItem                 || '');
-      setSwallowingReflexItem(prev.swallowingReflexItem || '');
-      setSkinItem(prev.skinItem                       || '');
-      setCharacteristicsItem(prev.characteristicsItem || '');
+      if (prev) {
+        setEvaluationItem(prev.evaluationItem           || '');
+        setVentilationItem(prev.ventilationItem         || '');
+        setCirculationItem(prev.circulationItem         || '');
+        setAirRouteItem(prev.airRouteItem               || '');
+        setRespSoundsItem(prev.respSoundsItem           || '');
+        setLungSideItem(prev.lungSideItem               || '');
+        setLungPartItem(prev.lungPartItem               || '');
+        setQualityItem(prev.qualityItem                 || '');
+        setSwallowingReflexItem(prev.swallowingReflexItem || '');
+        setSkinItem(prev.skinItem                       || '');
+        setCharacteristicsItem(prev.characteristicsItem || '');
+      } else {
+        // No hay data previa → mostrar defaults en UI
+        applyDefaultsToUI();
+      }
     })();
   }, [paramId, sessionId]);
 
-  // Guardar / Terminar más tarde
-  const onSave = async (statusLabel) => {
+  // Botón único “Siguiente”: guarda como pending y navega
+  const handleNext = async () => {
+    if (isLocked) {
+      Alert.alert('Expediente finalizado', 'Este expediente ya está firmado y no puede editarse.');
+      return;
+    }
+
     let id = recordId;
     if (!id) {
       // crear expediente padre si no existe
@@ -126,35 +182,32 @@ export default function FirstEvaluationScreen() {
         intern:'', moreInterns:'', affiliation:'',
         gender:'', age:'', address:'', colony:'',
         municipality:'', phone:'', rightful:''
-      }, statusLabel);
+      }, 'pending');
       await createAllStubs(id);
       setSessionRecordId(id);
       setRecordId(id);
     } else {
-      await updateRecord(id, { status: statusLabel });
+      await updateRecord(id, { status: 'pending' });
     }
 
-    // ACTUALIZA CORRECTAMENTE LA COLUMNA respSoundsItem
+    const DEF = computeDefaults();
+
     await updateFirstEvaluation(id, {
-      evaluationItem,
-      ventilationItem,
-      circulationItem,
-      airRouteItem,
-      respSoundsItem,
-      lungSideItem,
-      lungPartItem,
-      qualityItem,
-      swallowingReflexItem,
-      skinItem,
-      characteristicsItem
+      evaluationItem:        coalesce(evaluationItem,        DEF.evaluationItem),
+      ventilationItem:       coalesce(ventilationItem,       DEF.ventilationItem),
+      circulationItem:       coalesce(circulationItem,       DEF.circulationItem),
+      airRouteItem:          coalesce(airRouteItem,          DEF.airRouteItem),
+      respSoundsItem:        coalesce(respSoundsItem,        DEF.respSoundsItem),
+      lungSideItem:          coalesce(lungSideItem,          DEF.lungSideItem),
+      lungPartItem:          coalesce(lungPartItem,          DEF.lungPartItem),
+      qualityItem:           coalesce(qualityItem,           DEF.qualityItem),
+      swallowingReflexItem:  coalesce(swallowingReflexItem,  DEF.swallowingReflexItem),
+      skinItem:              coalesce(skinItem,              DEF.skinItem),
+      characteristicsItem:   coalesce(characteristicsItem,   DEF.characteristicsItem),
     });
 
-    Alert.alert(
-      statusLabel === 'saved' ? 'Guardado' : 'Pendiente',
-      `Evaluación inicial ID ${id} → status: ${statusLabel}`
-    );
+    Alert.alert('Guardado', `Evaluación inicial guardada (ID ${id})`);
 
-    // ir a la siguiente pantalla
     router.push({
       pathname: '/PhysicalExplorationScreen',
       params: { recordId: id }
@@ -166,79 +219,29 @@ export default function FirstEvaluationScreen() {
       <Text style={s.title}>Evaluación Inicial</Text>
       <Image style={s.image} source={require('../assets/doctor.png')} />
 
-      <CustomPicker
-        label="Evaluación inicial"
-        selectedValue={evaluationItem}
-        onValueChange={setEvaluationItem}
-        options={firstEvaluationItems}
-      />
-      <CustomPicker
-        label="Ventilación"
-        selectedValue={ventilationItem}
-        onValueChange={setVentilationItem}
-        options={ventilationItems}
-      />
-      <CustomPicker
-        label="Circulación"
-        selectedValue={circulationItem}
-        onValueChange={setCirculationItem}
-        options={circulationItems}
-      />
-      <CustomPicker
-        label="Vía aérea"
-        selectedValue={airRouteItem}
-        onValueChange={setAirRouteItem}
-        options={airRouteItems}
-      />
-      <CustomPicker
-        label="Ruidos respiratorios"
-        selectedValue={respSoundsItem}
-        onValueChange={setRespSoundsItem}
-        options={respSoundsItems}
-      />
-      <CustomPicker
-        label="Lado del pulmón"
-        selectedValue={lungSideItem}
-        onValueChange={setLungSideItem}
-        options={lungSideItems}
-      />
-      <CustomPicker
-        label="Parte del pulmón"
-        selectedValue={lungPartItem}
-        onValueChange={setLungPartItem}
-        options={lungPartItems}
-      />
-      <CustomPicker
-        label="Calidad"
-        selectedValue={qualityItem}
-        onValueChange={setQualityItem}
-        options={qualityItems}
-      />
-      <CustomPicker
-        label="Reflejo de deglución"
-        selectedValue={swallowingReflexItem}
-        onValueChange={setSwallowingReflexItem}
-        options={swallowingItems}
-      />
-      <CustomPicker
-        label="Piel"
-        selectedValue={skinItem}
-        onValueChange={setSkinItem}
-        options={skinItems}
-      />
-      <CustomPicker
-        label="Características"
-        selectedValue={characteristicsItem}
-        onValueChange={setCharacteristicsItem}
-        options={characteristicsItems}
-      />
+      {/* Estado visual */}
+      <Text style={[s.badge, isLocked ? s.badgeSaved : s.badgePending]}>
+        {isLocked ? 'Finalizado' : 'Borrador'}
+      </Text>
 
-      <TouchableOpacity style={s.saveButton} onPress={() => onSave('saved')}>
-        <Text style={s.buttonText}>Guardar</Text>
-      </TouchableOpacity>
-      <TouchableOpacity style={s.pendingButton} onPress={() => onSave('pending')}>
-        <Text style={s.buttonText}>Terminar más tarde</Text>
-      </TouchableOpacity>
+      <CustomPicker label="Evaluación inicial"     selectedValue={evaluationItem}     onValueChange={(v)=>!isLocked&&setEvaluationItem(v)}     options={firstEvaluationItems} enabled={!isLocked} />
+      <CustomPicker label="Ventilación"            selectedValue={ventilationItem}    onValueChange={(v)=>!isLocked&&setVentilationItem(v)}    options={ventilationItems}     enabled={!isLocked} />
+      <CustomPicker label="Circulación"            selectedValue={circulationItem}    onValueChange={(v)=>!isLocked&&setCirculationItem(v)}    options={circulationItems}     enabled={!isLocked} />
+      <CustomPicker label="Vía aérea"              selectedValue={airRouteItem}       onValueChange={(v)=>!isLocked&&setAirRouteItem(v)}       options={airRouteItems}        enabled={!isLocked} />
+      <CustomPicker label="Ruidos respiratorios"   selectedValue={respSoundsItem}     onValueChange={(v)=>!isLocked&&setRespSoundsItem(v)}     options={respSoundsItems}      enabled={!isLocked} />
+      <CustomPicker label="Lado del pulmón"        selectedValue={lungSideItem}       onValueChange={(v)=>!isLocked&&setLungSideItem(v)}       options={lungSideItems}        enabled={!isLocked} />
+      <CustomPicker label="Parte del pulmón"       selectedValue={lungPartItem}       onValueChange={(v)=>!isLocked&&setLungPartItem(v)}       options={lungPartItems}        enabled={!isLocked} />
+      <CustomPicker label="Calidad"                selectedValue={qualityItem}        onValueChange={(v)=>!isLocked&&setQualityItem(v)}        options={qualityItems}         enabled={!isLocked} />
+      <CustomPicker label="Reflejo de deglución"   selectedValue={swallowingReflexItem} onValueChange={(v)=>!isLocked&&setSwallowingReflexItem(v)} options={swallowingItems}  enabled={!isLocked} />
+      <CustomPicker label="Piel"                   selectedValue={skinItem}           onValueChange={(v)=>!isLocked&&setSkinItem(v)}           options={skinItems}            enabled={!isLocked} />
+      <CustomPicker label="Características"        selectedValue={characteristicsItem} onValueChange={(v)=>!isLocked&&setCharacteristicsItem(v)} options={characteristicsItems} enabled={!isLocked} />
+
+      {/* Botón único: Siguiente (oculto si está finalizado) */}
+      {!isLocked && (
+        <TouchableOpacity style={s.nextButton} onPress={handleNext}>
+          <Text style={s.buttonText}>Siguiente</Text>
+        </TouchableOpacity>
+      )}
     </ScrollView>
   );
 }
@@ -247,7 +250,9 @@ const s = StyleSheet.create({
   container:     { padding:20, alignItems:'center', backgroundColor:'#f5f5f5' },
   title:         { fontSize:24, fontWeight:'bold', marginBottom:10 },
   image:         { width:100, height:100, marginBottom:20, borderRadius:8 },
-  saveButton:    { backgroundColor:'#28a745', padding:12, borderRadius:8, marginTop:20, width:'100%' },
-  pendingButton: { backgroundColor:'#6c757d', padding:12, borderRadius:8, marginTop:10, width:'100%' },
+  badge:         { alignSelf:'flex-end', paddingVertical:4, paddingHorizontal:8, borderRadius:6, color:'#fff', fontWeight:'600', marginBottom:8 },
+  badgePending:  { backgroundColor:'#6c757d' },
+  badgeSaved:    { backgroundColor:'#28a745' },
+  nextButton:    { backgroundColor:'#1f9aef', padding:12, borderRadius:8, marginTop:16, width:'100%' },
   buttonText:    { color:'#fff', textAlign:'center', fontWeight:'bold' },
 });

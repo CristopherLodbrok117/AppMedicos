@@ -24,6 +24,7 @@ import {
   updateRecord,
   updatePhysicalExploration,
   getPhysicalExplorationById,
+  getRecordById,            // ← para leer status y bloquear edición
   getSessionRecordId,
   setSessionRecordId
 } from '../../services/database';
@@ -56,11 +57,16 @@ export default function PhysicalExplorationScreen() {
   const [selectedInjuries, setSelectedInjuries] = useState([]);
   const [showInjuries, setShowInjuries] = useState(false);
 
+  // Estado del expediente (para bloqueo de edición)
+  const [status, setStatus] = useState('pending');
+  const isLocked = status === 'saved';
+
   // Vacía formulario y sesión local
   const clearForm = () => {
     setSelectedInjuries([]);
     setShowInjuries(false);
     setRecordId(null);
+    setStatus('pending');
   };
 
   // 1) Si pulsaste “Nuevo” en Home, clearForm()
@@ -70,7 +76,7 @@ export default function PhysicalExplorationScreen() {
     }
   }, []));
 
-  // 2) Inicializa BD, reserva stubs y carga datos previos
+  // 2) Inicializa BD, reserva stubs y carga datos previos + status
   useEffect(() => {
     (async () => {
       await initDatabase();
@@ -78,6 +84,11 @@ export default function PhysicalExplorationScreen() {
       if (!id) return;
       setRecordId(id);
       await createAllStubs(id);
+
+      // Lee status para saber si está finalizado
+      const rec = await getRecordById(id);
+      if (rec && rec.status) setStatus(rec.status);
+
       const prev = await getPhysicalExplorationById(id);
       if (prev && prev.injuries) {
         try {
@@ -89,8 +100,13 @@ export default function PhysicalExplorationScreen() {
     })();
   }, [paramId]);
 
-  // 3) Guardar o “Terminar más tarde”
-  const onSave = async (statusLabel) => {
+  // 3) Guardar como borrador y avanzar (botón Siguiente)
+  const handleNext = async () => {
+    if (isLocked) {
+      Alert.alert('Expediente finalizado', 'Este expediente ya está firmado y no puede editarse.');
+      return;
+    }
+
     let id = recordId;
     if (!id) {
       // crear padre si no existe
@@ -103,12 +119,13 @@ export default function PhysicalExplorationScreen() {
         intern:'', moreInterns:'', affiliation:'',
         gender:'', age:'', address:'', colony:'',
         municipality:'', phone:'', rightful:''
-      }, statusLabel);
+      }, 'pending');
       await createAllStubs(id);
       setSessionRecordId(id);
       setRecordId(id);
     } else {
-      await updateRecord(id, { status: statusLabel });
+      await updateRecord(id, { status: 'pending' }); // ← BORRADOR
+      setStatus('pending');
     }
 
     // actualizar lesiones
@@ -116,10 +133,9 @@ export default function PhysicalExplorationScreen() {
       injuries: JSON.stringify(selectedInjuries)
     });
 
-    Alert.alert(
-      statusLabel === 'saved' ? 'Guardado' : 'Pendiente',
-      `Exploración física ID ${id} → status: ${statusLabel}`
-    );
+    Alert.alert('Guardado', `Exploración física ID ${id} → borrador`);
+    // Navega al siguiente paso (ajusta si tu siguiente screen es otra)
+    router.push({ pathname: '/PatientConditionScreen', params: { recordId: id } });
   };
 
   return (
@@ -134,7 +150,8 @@ export default function PhysicalExplorationScreen() {
 
       <TouchableOpacity
         style={styles.expandButton}
-        onPress={() => setShowInjuries(!showInjuries)}
+        onPress={() => { if (!isLocked) setShowInjuries(!showInjuries); }}
+        disabled={isLocked}
       >
         <Text style={styles.buttonText}>
           {showInjuries ? 'Cerrar' : 'Elegir tipo de lesión'}
@@ -147,7 +164,7 @@ export default function PhysicalExplorationScreen() {
         </View>
       )}
 
-      <Modal visible={showInjuries} animationType="slide" transparent>
+      <Modal visible={showInjuries} animationType="slide" transparent onRequestClose={() => setShowInjuries(false)}>
         <View style={styles.modalOverlay}>
           <View style={styles.modalContent}>
             <Text style={styles.modalTitle}>Tipo de lesión</Text>
@@ -155,7 +172,10 @@ export default function PhysicalExplorationScreen() {
               <CheckListV1
                 items={INJURIES}
                 selectedItems={selectedInjuries}
-                setSelectedItems={setSelectedInjuries}
+                setSelectedItems={(arr) => {
+                  if (isLocked) return;     // ← no permitir cambios si está finalizado
+                  setSelectedInjuries(arr);
+                }}
               />
             </View>
             <Pressable
@@ -170,21 +190,19 @@ export default function PhysicalExplorationScreen() {
 
       <View style={styles.imageArea}>
         <Text style={styles.subtitle}>Zona de lesión</Text>
+        {/* No tocamos tu componente; solo se bloquea la edición por status en la UI de la lista/abrir modal */}
         <IconImageV1 />
       </View>
 
-      <TouchableOpacity
-        style={styles.saveButton}
-        onPress={() => onSave('saved')}
-      >
-        <Text style={styles.buttonText}>Guardar</Text>
-      </TouchableOpacity>
-      <TouchableOpacity
-        style={styles.saveButton}
-        onPress={() => onSave('pending')}
-      >
-        <Text style={styles.buttonText}>Terminar más tarde</Text>
-      </TouchableOpacity>
+      {/* Botón único: Siguiente (solo si NO está finalizado) */}
+      {!isLocked && (
+        <TouchableOpacity
+          style={styles.saveButton}
+          onPress={handleNext}
+        >
+          <Text style={styles.buttonText}>Siguiente</Text>
+        </TouchableOpacity>
+      )}
     </ScrollView>
   );
 }

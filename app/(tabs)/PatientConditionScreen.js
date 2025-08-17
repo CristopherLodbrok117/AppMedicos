@@ -20,6 +20,7 @@ import {
   updatePatientCondition,
   updateRecord,
   getPatientConditionById,
+  getRecordById,            // ← para leer status y bloquear edición
   getSessionRecordId,
   setSessionRecordId
 } from '../../services/database';
@@ -31,6 +32,10 @@ export default function PatientConditionScreen() {
 
   const sessionId = getSessionRecordId();
   const [recordId, setRecordId] = useState(paramId || sessionId);
+
+  // Estado del expediente
+  const [status, setStatus] = useState('pending');
+  const isLocked = status === 'saved';
 
   // Campos de condición
   const [stability, setStability]             = useState('');
@@ -60,24 +65,15 @@ export default function PatientConditionScreen() {
 
   // Limpia al pulsar “Nuevo”
   const clearForm = () => {
-    setStability('');
-    setPatientColor('');
-    setAirway('');
-    setDecompression('');
-    setSide('');
-    setCervical('');
-    setVentilatoryHelp('');
-    setOxygenTherapy('');
-    setHemorrhageCtrl('');
-    setSolutionType('');
-    setRcp('');
-    setRecordId(null);
+    setStability(''); setPatientColor(''); setAirway(''); setDecompression(''); setSide('');
+    setCervical(''); setVentilatoryHelp(''); setOxygenTherapy(''); setHemorrhageCtrl('');
+    setSolutionType(''); setRcp(''); setRecordId(null); setStatus('pending');
   };
   useFocusEffect(useCallback(() => {
     if (getSessionRecordId() === null) clearForm();
   }, [sessionId]));
 
-  // Inicializa BD, stubs y carga datos previos
+  // Inicializa BD, stubs y carga datos previos + status
   useEffect(() => {
     (async () => {
       await initDatabase();
@@ -85,6 +81,10 @@ export default function PatientConditionScreen() {
       if (!id) return;
       setRecordId(id);
       await createAllStubs(id);
+
+      const rec = await getRecordById(id);
+      if (rec && rec.status) setStatus(rec.status);
+
       const prev = await getPatientConditionById(id);
       if (prev) {
         setStability(prev.stability || '');
@@ -102,8 +102,13 @@ export default function PatientConditionScreen() {
     })();
   }, [paramId, sessionId]);
 
-  // Guardar / Terminar más tarde
-  const onSave = async (statusLabel) => {
+  // Botón único: “Siguiente” (guarda como borrador y avanza)
+  const handleNext = async () => {
+    if (isLocked) {
+      Alert.alert('Expediente finalizado', 'Este expediente ya está firmado y no puede editarse.');
+      return;
+    }
+
     let id = recordId;
     if (!id) {
       const now = new Date();
@@ -115,12 +120,13 @@ export default function PatientConditionScreen() {
         intern:'', moreInterns:'', affiliation:'',
         gender:'', age:'', address:'', colony:'',
         municipality:'', phone:'', rightful:''
-      }, statusLabel);
+      }, 'pending'); // ← borrador
       await createAllStubs(id);
       setSessionRecordId(id);
       setRecordId(id);
     } else {
-      await updateRecord(id, { status: statusLabel });
+      await updateRecord(id, { status: 'pending' }); // ← asegúrate que quede en borrador
+      setStatus('pending');
     }
 
     await updatePatientCondition(id, {
@@ -137,15 +143,8 @@ export default function PatientConditionScreen() {
       rcp
     });
 
-    Alert.alert(
-      statusLabel === 'saved' ? 'Guardado' : 'Pendiente',
-      `Condición del paciente ID ${id} → status: ${statusLabel}`
-    );
-
-    router.push({
-      pathname: '/FirstEvaluationScreen',
-      params: { recordId: id }
-    });
+    Alert.alert('Guardado', `Condición del paciente ID ${id} → borrador`);
+    router.push({ pathname: '/PatientTransferScreen', params: { recordId: id } });
   };
 
   return (
@@ -154,20 +153,23 @@ export default function PatientConditionScreen() {
       <Text style={styles.subtitle}>Expediente médico</Text>
       <Image style={styles.image} source={require('../assets/doctor.png')} />
 
-      <CustomPicker label="Se encuentra estable"      selectedValue={stability}       onValueChange={setStability}       options={stabilityItems} />
-      <CustomPicker label="Color del paciente"        selectedValue={patientColor}     onValueChange={setPatientColor}     options={patientColors} />
-      <CustomPicker label="Vía aérea"                 selectedValue={airway}           onValueChange={setAirway}           options={airways} />
-      <CustomPicker label="Descompresión pleural"     selectedValue={decompression}    onValueChange={setDecompression}    options={decompressionItems} />
-      <CustomPicker label="Lado"                      selectedValue={side}             onValueChange={setSide}             options={sides} />
-      <CustomPicker label="Control cervical"          selectedValue={cervical}         onValueChange={setCervical}         options={cervicals} />
-      <CustomPicker label="Asistencia ventilatoria"   selectedValue={ventilatoryHelp}  onValueChange={setVentilatoryHelp}  options={ventilatoryHelpItems} />
-      <CustomPicker label="Oxigenoterapia"            selectedValue={oxygenTherapy}    onValueChange={setOxygenTherapy}    options={oxygenTherapyItems} />
-      <CustomPicker label="Control de hemorragías"    selectedValue={hemorrhageCtrl}   onValueChange={setHemorrhageCtrl}   options={hemorrhageItems} />
-      <CustomPicker label="Tipo de soluciones"        selectedValue={solutionType}     onValueChange={setSolutionType}     options={solutionTypes} />
-      <CustomPicker label="RCP"                       selectedValue={rcp}              onValueChange={setRcp}              options={rcps} />
+      <CustomPicker label="Se encuentra estable"      selectedValue={stability}       onValueChange={setStability}       options={stabilityItems}       enabled={!isLocked} />
+      <CustomPicker label="Color del paciente"        selectedValue={patientColor}    onValueChange={setPatientColor}    options={patientColors}        enabled={!isLocked} />
+      <CustomPicker label="Vía aérea"                 selectedValue={airway}          onValueChange={setAirway}          options={airways}              enabled={!isLocked} />
+      <CustomPicker label="Descompresión pleural"     selectedValue={decompression}   onValueChange={setDecompression}   options={decompressionItems}   enabled={!isLocked} />
+      <CustomPicker label="Lado"                      selectedValue={side}            onValueChange={setSide}            options={sides}                enabled={!isLocked} />
+      <CustomPicker label="Control cervical"          selectedValue={cervical}        onValueChange={setCervical}        options={cervicals}            enabled={!isLocked} />
+      <CustomPicker label="Asistencia ventilatoria"   selectedValue={ventilatoryHelp} onValueChange={setVentilatoryHelp} options={ventilatoryHelpItems} enabled={!isLocked} />
+      <CustomPicker label="Oxigenoterapia"            selectedValue={oxygenTherapy}   onValueChange={setOxygenTherapy}   options={oxygenTherapyItems}   enabled={!isLocked} />
+      <CustomPicker label="Control de hemorragías"    selectedValue={hemorrhageCtrl}  onValueChange={setHemorrhageCtrl}  options={hemorrhageItems}      enabled={!isLocked} />
+      <CustomPicker label="Tipo de soluciones"        selectedValue={solutionType}    onValueChange={setSolutionType}    options={solutionTypes}        enabled={!isLocked} />
+      <CustomPicker label="RCP"                       selectedValue={rcp}             onValueChange={setRcp}             options={rcps}                 enabled={!isLocked} />
 
-      <TouchableOpacity style={styles.saveButton}    onPress={() => onSave('saved')}   ><Text style={styles.buttonText}>Guardar</Text></TouchableOpacity>
-      <TouchableOpacity style={styles.pendingButton} onPress={() => onSave('pending')}><Text style={styles.buttonText}>Terminar más tarde</Text></TouchableOpacity>
+      {!isLocked && (
+        <TouchableOpacity style={styles.nextButton} onPress={handleNext}>
+          <Text style={styles.buttonText}>Siguiente</Text>
+        </TouchableOpacity>
+      )}
     </ScrollView>
   );
 }
@@ -177,7 +179,6 @@ const styles = StyleSheet.create({
   title:         { fontSize:24, fontWeight:'bold', marginBottom:10 },
   subtitle:      { fontSize:18, fontWeight:'600', color:'#555', marginBottom:20 },
   image:         { width:100, height:100, marginBottom:20, borderRadius:8 },
-  saveButton:    { backgroundColor:'#28a745', padding:12, borderRadius:8, width:'100%', marginTop:20 },
-  pendingButton: { backgroundColor:'#6c757d', padding:12, borderRadius:8, width:'100%', marginTop:10 },
+  nextButton:    { backgroundColor:'#1f9aef', padding:12, borderRadius:8, width:'100%', marginTop:20 },
   buttonText:    { color:'#fff', textAlign:'center', fontWeight:'bold' }
 });
