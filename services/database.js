@@ -8,14 +8,17 @@ let db = null;
 let _sessionRecordId = null; // Mantiene el ID de la sesión hasta que se pulse “Nuevo”
 
 // Convierte la etiqueta de recurso en el nombre de columna
+// Convierte la etiqueta de recurso en el nombre de columna
 const toColumnName = label =>
-  label
+  String(label)
     .normalize('NFD')
     .replace(/[\u0300-\u036f]/g, '')
     .toLowerCase()
-    .replace(/[^a-z0-9 ]/g, '')
+    .replace(/[^a-z0-9_ ]/g, '')   // <— permite "_"
     .trim()
     .replace(/\s+/g, '_');
+
+
 
 export async function initDatabase() {
   if (db) return db;
@@ -111,27 +114,36 @@ export async function initDatabase() {
   `);
 
   // 5) Patient transfers
-  await db.executeSql(`
-    CREATE TABLE IF NOT EXISTS patient_transfers (
-      id               INTEGER PRIMARY KEY,
-      fromLocation     TEXT,
-      toLocation       TEXT,
-      reason           TEXT,
-      vehicleUsed      TEXT,
-      institution      TEXT,
-      patientName      TEXT,
-      witnessName      TEXT,
-      observations     TEXT,
-      dependencies     TEXT,
-      units            TEXT,
-      officerName      TEXT,
-      belongings       TEXT,
-      receiver         TEXT,
-      paramedicName    TEXT,
-      doctorName       TEXT,
-      FOREIGN KEY (id) REFERENCES records(id)
-    );
-  `);
+// 5) Patient transfers
+await db.executeSql(`
+  CREATE TABLE IF NOT EXISTS patient_transfers (
+    id               INTEGER PRIMARY KEY,
+    fromLocation     TEXT,
+    toLocation       TEXT,
+    reason           TEXT,
+    vehicleUsed      TEXT,
+    institution      TEXT,
+    patientName      TEXT,
+    witnessName      TEXT,
+    observations     TEXT,
+    dependencies     TEXT,
+    units            TEXT,
+    officerName      TEXT,
+    belongings       TEXT,
+    receiver         TEXT,
+    paramedicName    TEXT,
+    doctorName       TEXT,
+
+    -- Firmas integradas en el schema
+    patientSignatureSvg   TEXT,
+    paramedicSignatureSvg TEXT,
+    doctorSignatureSvg    TEXT,
+
+    FOREIGN KEY (id) REFERENCES records(id)
+  );
+`);
+
+
 
   // 6) Physical explorations (con columna injuries)
   await db.executeSql(`
@@ -255,28 +267,94 @@ export async function updateRecord(recordId, fieldsObj) {
   console.log(`✏️ records[${recordId}] actualizado`);
 }
 
-// Actualiza sólo las columnas que cambiaste en deployed_resources
-export async function updateDeployedResources(recordId, resourcesArray) {
+// Lista blanca: columnas EXACTAS de deployed_resources
+const DEPLOYED_COLUMNS = new Set([
+  'agua_inyectable_500ml','agua_oxigenada','agujas_20x32','algodon_paquete',
+  'bata_desechable','bolsa_negra','bolsa_roja','bolsa_amarilla','bum_free_gel',
+  'campos_esteriles','canula_blanda_de_aspiracion','canulas_nasofaringeas',
+  'canulas_orofaringeas','canula_yankawer','cateter_12','cateter_14','cateter_16',
+  'cateter_18','cateter_20','cateter_22','cateter_24','cinta_transporte_3m_1',
+  'cinta_transporte_3m_2','collarines_desechables','cubrebocas',
+  'desinfectante_para_manos','desinfectante_para_superficies',
+  'fijador_de_te_adulto','fijador_de_te_pediatrico','gasas_esteriles',
+  'gasas_no_esteriles'
+]);
+
+// Normaliza una clave (ya sea etiqueta o nombre de columna) a una columna válida del schema
+const normalizeColumn = (key) => {
+  if (!key) return null;
+  const raw = String(key);
+  if (DEPLOYED_COLUMNS.has(raw)) return raw;        // ya coincide con el schema
+  const norm = toColumnName(raw);                   // normaliza etiquetas con acentos/espacios
+  return DEPLOYED_COLUMNS.has(norm) ? norm : null;  // solo si existe en whitelist
+};
+
+/**
+ * Actualiza deployed_resources para un recordId.
+ * Acepta:
+ *  - Objeto:  { columna_schema_o_etiqueta: cantidad, ... }
+ *  - Arreglo: [{ name|col: 'Etiqueta o columna', quantity|qty|value: n }, ...]
+ * Siempre crea la fila (INSERT OR IGNORE) y hace UN solo UPDATE.
+ */
+export async function updateDeployedResources(recordId, data) {
   const db = await initDatabase();
-  // Asegura el stub
+
+  // Asegurar fila del expediente
   await db.executeSql(
     `INSERT OR IGNORE INTO deployed_resources (recordId) VALUES (?);`,
     [recordId]
   );
-  // Recorre sólo los que cambiaste
-  for (const { name, quantity } of resourcesArray) {
-    const col = toColumnName(name);
-    await db.executeSql(
-      `UPDATE deployed_resources
-         SET ${col} = ?
-       WHERE recordId = ?;`,
-      [quantity, recordId]
-    );
+
+  // Normaliza a pares [columna válida, valor]
+  const pairs = [];
+
+  if (Array.isArray(data)) {
+    for (const item of data) {
+      if (!item) continue;
+      const col = normalizeColumn(item.col ?? item.name);
+      if (!col) continue;
+      const val = Number(item.qty ?? item.quantity ?? item.value ?? 0) || 0;
+      pairs.push([col, val]);
+    }
+  } else if (data && typeof data === 'object') {
+    for (const [k, v] of Object.entries(data)) {
+      const col = normalizeColumn(k);
+      if (!col) continue;
+      const val = Number(v ?? 0) || 0;
+      pairs.push([col, val]);
+    }
   }
-  console.log(`✏️ deployed_resources[${recordId}] actualizado`);
+
+  if (pairs.length === 0) {
+    console.log('ℹ️ updateDeployedResources: nada que actualizar');
+    return;
+  }
+
+  // Un solo UPDATE
+  const setClause = pairs.map(([c]) => `"${c}" = ?`).join(', ');
+  const values = pairs.map(([, v]) => v);
+
+  console.log('🛠 UPDATE deployed_resources SET', setClause, 'WHERE recordId =', recordId, 'vals=', values);
+
+  await db.executeSql(
+    `UPDATE deployed_resources SET ${setClause} WHERE recordId = ?;`,
+    [...values, recordId]
+  );
+
+  console.log(`✏️ deployed_resources[${recordId}] actualizado:`, Object.fromEntries(pairs));
+
+  // (opcional) lee la fila para verificar
+  const [check] = await db.executeSql(
+    `SELECT * FROM deployed_resources WHERE recordId = ?;`,
+    [recordId]
+  );
+  if (check.rows.length) {
+    const row = check.rows.item(0);
+    console.log('📦 fila luego del UPDATE:', row);
+  }
 }
 
-// Lee la única fila de deployed_resources
+// Lee la fila completa
 export async function getDeployedResourcesById(recordId) {
   const db = await initDatabase();
   const [res] = await db.executeSql(

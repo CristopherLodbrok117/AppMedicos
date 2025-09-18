@@ -1,27 +1,27 @@
 // app/(tabs)/DeployedResourcesScreen.js
 import React, { useState, useEffect, useCallback } from 'react';
-import { 
-  ScrollView, 
-  Text, 
-  TouchableOpacity, 
-  StyleSheet, 
-  Image, 
-  Alert 
+import {
+  ScrollView,
+  Text,
+  TouchableOpacity,
+  StyleSheet,
+  Image,
+  Alert
 } from 'react-native';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import { useFocusEffect } from '@react-navigation/native';
 
 import Resource from '../components/Resource';
 
-import { 
-  initDatabase, 
-  insertRecord, 
-  createAllStubs, 
-  updateRecord, 
-  updateDeployedResources, 
-  getDeployedResourcesById, 
-  getSessionRecordId, 
-  setSessionRecordId 
+import {
+  initDatabase,
+  insertRecord,
+  createAllStubs,
+  updateRecord,
+  updateDeployedResources,
+  getDeployedResourcesById,
+  getSessionRecordId,
+  setSessionRecordId
 } from '../../services/database';
 
 // Etiquetas tal como aparecen al usuario
@@ -37,13 +37,13 @@ const AVAILABLE_RESOURCES = [
   'Gasas no estériles'
 ];
 
-// Pasa la etiqueta a nombre de columna: quita acentos, espacios → _
-const toColumnName = label =>
-  label
+// Normaliza etiqueta → nombre de columna (conserva "_")
+const toColumnName = (label) =>
+  String(label)
     .normalize('NFD')
     .replace(/[\u0300-\u036f]/g, '')
     .toLowerCase()
-    .replace(/[^a-z0-9 ]/g, '')
+    .replace(/[^a-z0-9_ ]/g, '') // ← permite "_"
     .trim()
     .replace(/\s+/g, '_');
 
@@ -62,9 +62,12 @@ export default function DeployedResourcesScreen() {
     setQuantities({});
     setRecordId(null);
   };
-  useFocusEffect(useCallback(() => {
-    if (getSessionRecordId() === null) clearForm();
-  }, []));
+
+  useFocusEffect(
+    useCallback(() => {
+      if (getSessionRecordId() === null) clearForm();
+    }, [])
+  );
 
   // Al montar / cambiar paramId: init, stubs y carga
   useEffect(() => {
@@ -74,10 +77,15 @@ export default function DeployedResourcesScreen() {
       if (!id) return;
       setRecordId(id);
       await createAllStubs(id);
+
       const row = await getDeployedResourcesById(id);
       if (row) {
-        const { recordId: _, ...cols } = row;
-        setQuantities(cols);
+        const { recordId: _ignore, ...cols } = row;
+        const numericCols = Object.fromEntries(
+          Object.entries(cols).map(([k, v]) => [k, Number(v) || 0])
+        );
+        setQuantities(numericCols);
+        console.log('📥 Cargado desde DB:', numericCols);
       }
     })();
   }, [paramId]);
@@ -85,11 +93,12 @@ export default function DeployedResourcesScreen() {
   // Cuando cambias cantidad en un recurso
   const onResourceChange = (label, qty) => {
     const col = toColumnName(label);
-    setQuantities(curr => ({ ...curr, [col]: qty }));
+    const val = Number(qty);
+    setQuantities(curr => ({ ...curr, [col]: Number.isFinite(val) ? val : 0 }));
   };
 
   // Guardar / Terminar más tarde
-  const onSave = async statusLabel => {
+  const onSave = async (statusLabel) => {
     let id = recordId;
     if (!id) {
       const now = new Date();
@@ -109,7 +118,8 @@ export default function DeployedResourcesScreen() {
       await updateRecord(id, { status: statusLabel });
     }
 
-    await updateDeployedResources(id, quantities);
+    console.log('📝 Guardando quantities →', quantities);
+    await updateDeployedResources(id, quantities); // ← objeto {col: cantidad}
 
     Alert.alert(
       statusLabel === 'saved' ? 'Guardado' : 'Pendiente',
@@ -117,7 +127,6 @@ export default function DeployedResourcesScreen() {
       [{
         text: 'OK',
         onPress: () => {
-          // <-- reemplazamos el push con objeto
           router.replace(`/DeployedResourcesScreen?recordId=${id}`);
         }
       }],

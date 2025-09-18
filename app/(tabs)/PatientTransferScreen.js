@@ -1,20 +1,13 @@
-// app/(tabs)/PatientTransferScreen.js
 import React, { useState, useEffect, useCallback } from 'react';
 import {
-  View,
-  Text,
-  Image,
-  ScrollView,
-  TouchableOpacity,
-  StyleSheet,
-  Alert
+  View, Text, Image, ScrollView, TouchableOpacity,
+  StyleSheet, Alert,
 } from 'react-native';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import { useFocusEffect } from '@react-navigation/native';
 
 import FloatingLabelInput from '../components/FloatingLabelInput';
 import CustomPicker from '../components/CustomPicker';
-import RedirectButton from '../components/RedirectButton';
 
 import {
   initDatabase,
@@ -24,7 +17,7 @@ import {
   updatePatientTransfer,
   getPatientTransferById,
   getSessionRecordId,
-  setSessionRecordId
+  setSessionRecordId,
 } from '../../services/database';
 
 export default function PatientTransferScreen() {
@@ -47,12 +40,16 @@ export default function PatientTransferScreen() {
   const [paramedicName, setParamedicName] = useState('');
   const [doctorName, setDoctorName] = useState('');
 
+  // Estados de firma (solo para mostrar “Firmado ✓”)
+  const [patientSignatureSvg, setPatientSignatureSvg] = useState(null);
+  const [paramedicSignatureSvg, setParamedicSignatureSvg] = useState(null);
+  const [doctorSignatureSvg, setDoctorSignatureSvg] = useState(null);
+
   const paramedicNames = [
     'TSUP Rodrigo de Jesus Guitierrez Vega',
     'Dalto',
-    'Bryan'
+    'Bryan',
   ];
-  const doctorNames = ['Dr. House', 'Dr. Who', 'Dr. Strange'];
 
   const clearForm = () => {
     setInstitution('');
@@ -66,17 +63,20 @@ export default function PatientTransferScreen() {
     setReceiver('');
     setParamedicName('');
     setDoctorName('');
+    setPatientSignatureSvg(null);
+    setParamedicSignatureSvg(null);
+    setDoctorSignatureSvg(null);
     setRecordId(null);
   };
 
-  // 1) Si pulsaste “Nuevo” en Home, limpiar todo
-  useFocusEffect(useCallback(() => {
-    if (getSessionRecordId() === null) {
-      clearForm();
-    }
-  }, []));
+  // Si pulsaste “Nuevo” en Home, limpiar todo
+  useFocusEffect(
+    useCallback(() => {
+      if (getSessionRecordId() === null) clearForm();
+    }, [])
+  );
 
-  // 2) Inicializa BD y carga datos previos
+  // Cargar datos al montar y cuando cambia el paramId
   useEffect(() => {
     (async () => {
       await initDatabase();
@@ -97,34 +97,54 @@ export default function PatientTransferScreen() {
       setReceiver(prev.receiver || '');
       setParamedicName(prev.paramedicName || '');
       setDoctorName(prev.doctorName || '');
+      setPatientSignatureSvg(prev.patientSignatureSvg || null);
+      setParamedicSignatureSvg(prev.paramedicSignatureSvg || null);
+      setDoctorSignatureSvg(prev.doctorSignatureSvg || null);
     })();
   }, [paramId]);
 
-  // 3) Función de guardado / terminar más tarde
+  // IMPORTANTe: refrescar firmas al volver de la pantalla de firma
+  useFocusEffect(
+    useCallback(() => {
+      (async () => {
+        if (!recordId) return;
+        const prev = await getPatientTransferById(recordId);
+        if (!prev) return;
+        setPatientSignatureSvg(prev.patientSignatureSvg || null);
+        setParamedicSignatureSvg(prev.paramedicSignatureSvg || null);
+        setDoctorSignatureSvg(prev.doctorSignatureSvg || null);
+      })();
+    }, [recordId])
+  );
+
+  // Guardar / terminar más tarde
   const onSave = async (statusLabel) => {
     let id = recordId;
     if (!id) {
       const now = new Date();
-      id = await insertRecord({
-        date: now.toISOString().slice(0, 10),
-        time: now.toTimeString().slice(0, 8),
-        weekDay: '',
-        attentionReason: '',
-        serviceLocation: '',
-        vehicleType: '',
-        vehicleNum: '',
-        operator: '',
-        intern: '',
-        moreInterns: '',
-        affiliation: '',
-        gender: '',
-        age: '',
-        address: '',
-        colony: '',
-        municipality: '',
-        phone: '',
-        rightful: ''
-      }, statusLabel);
+      id = await insertRecord(
+        {
+          date: now.toISOString().slice(0, 10),
+          time: now.toTimeString().slice(0, 8),
+          weekDay: '',
+          attentionReason: '',
+          serviceLocation: '',
+          vehicleType: '',
+          vehicleNum: '',
+          operator: '',
+          intern: '',
+          moreInterns: '',
+          affiliation: '',
+          gender: '',
+          age: '',
+          address: '',
+          colony: '',
+          municipality: '',
+          phone: '',
+          rightful: '',
+        },
+        statusLabel
+      );
       await createAllStubs(id);
       setSessionRecordId(id);
       setRecordId(id);
@@ -143,7 +163,8 @@ export default function PatientTransferScreen() {
       belongings,
       receiver,
       paramedicName,
-      doctorName
+      doctorName,
+      // las firmas se guardan en SignatureTestScreen
     });
 
     Alert.alert(
@@ -151,25 +172,30 @@ export default function PatientTransferScreen() {
       `Traslado ID ${id} → status: ${statusLabel}`
     );
 
-    // Navegar a Home o donde quieras
+    // Navega a la siguiente pantalla si quieres
+    // router.push({ pathname: '/DeployedResourcesScreen', params: { recordId: id } });
+  };
+
+  const openSignature = (target) => {
+    if (!recordId) {
+      Alert.alert(
+        'Sin expediente',
+        'Primero guarda o marca como pendiente para crear el expediente.'
+      );
+      return;
+    }
     router.push({
-     pathname: '/DeployedResourcesScreen',
-     params: { recordId: id }
-   });
+      pathname: '/(signature)/SignatureTestScreen',
+      params: { recordId, target, returnTo: '/PatientTransferScreen' },
+    });
   };
 
   return (
     <View style={styles.container}>
-      <ScrollView
-        contentContainerStyle={styles.mainContent}
-        nestedScrollEnabled
-      >
+      <ScrollView contentContainerStyle={styles.mainContent} nestedScrollEnabled>
         <Text style={styles.title}>Traslado de paciente</Text>
         <Text style={styles.subtitle}>Expediente médico</Text>
-        <Image
-          style={styles.image}
-          source={require('../assets/doctor.png')}
-        />
+        <Image style={styles.image} source={require('../assets/doctor.png')} />
 
         <FloatingLabelInput
           label="Institución de traslado"
@@ -187,20 +213,26 @@ export default function PatientTransferScreen() {
 
         <Text style={styles.sectionSubtitle}>Información del paciente</Text>
 
-        <View style={styles.signature}>
-          <View style={styles.signatureInput}>
+        {/* Paciente + Firma */}
+        <View className="row" style={styles.row}>
+          <View style={styles.flex75}>
             <FloatingLabelInput
               label="Nombre del paciente"
               iconName="person"
               value={patientName}
               onChangeText={setPatientName}
             />
+            {patientSignatureSvg ? (
+              <Text style={styles.signedTxt}>Firmado ✓</Text>
+            ) : null}
           </View>
-          <View style={styles.signatureButton}>
-            <RedirectButton
-              refName="(signature)/SignatureTestScreen"
-              iconName="edit-square"
-            />
+          <View style={styles.flex20}>
+            <TouchableOpacity
+              style={styles.signBtn}
+              onPress={() => openSignature('patient')}
+            >
+              <Text style={styles.signBtnTxt}>Firmar</Text>
+            </TouchableOpacity>
           </View>
         </View>
 
@@ -252,50 +284,56 @@ export default function PatientTransferScreen() {
           onChangeText={setReceiver}
         />
 
-        <View style={styles.signature}>
-          <View style={styles.signatureInput}>
+        {/* Paramédico + Firma */}
+        <View style={styles.row}>
+          <View style={styles.flex75}>
             <CustomPicker
               label="Entrega a paciente"
               selectedValue={paramedicName}
               onValueChange={setParamedicName}
               options={paramedicNames}
             />
+            {paramedicSignatureSvg ? (
+              <Text style={styles.signedTxt}>Firmado ✓</Text>
+            ) : null}
           </View>
-          <View style={styles.signatureButton}>
-            <RedirectButton
-              refName="(signature)/SignatureTestScreen"
-              iconName="edit-square"
-            />
+          <View style={styles.flex20}>
+            <TouchableOpacity
+              style={styles.signBtn}
+              onPress={() => openSignature('paramedic')}
+            >
+              <Text style={styles.signBtnTxt}>Firmar</Text>
+            </TouchableOpacity>
           </View>
         </View>
 
-        <View style={styles.signature}>
-          <View style={styles.signatureInput}>
+        {/* Médico + Firma */}
+        <View style={styles.row}>
+          <View style={styles.flex75}>
             <FloatingLabelInput
               label="Médico que recibe"
               iconName="person"
               value={doctorName}
               onChangeText={setDoctorName}
             />
+            {doctorSignatureSvg ? (
+              <Text style={styles.signedTxt}>Firmado ✓</Text>
+            ) : null}
           </View>
-          <View style={styles.signatureButton}>
-            <RedirectButton
-              refName="(signature)/SignatureTestScreen"
-              iconName="edit-square"
-            />
+          <View style={styles.flex20}>
+            <TouchableOpacity
+              style={styles.signBtn}
+              onPress={() => openSignature('doctor')}
+            >
+              <Text style={styles.signBtnTxt}>Firmar</Text>
+            </TouchableOpacity>
           </View>
         </View>
 
-        <TouchableOpacity
-          style={styles.saveButton}
-          onPress={() => onSave('saved')}
-        >
+        <TouchableOpacity style={styles.saveButton} onPress={() => onSave('saved')}>
           <Text style={styles.buttonText}>Guardar</Text>
         </TouchableOpacity>
-        <TouchableOpacity
-          style={styles.pendingButton}
-          onPress={() => onSave('pending')}
-        >
+        <TouchableOpacity style={styles.pendingButton} onPress={() => onSave('pending')}>
           <Text style={styles.buttonText}>Terminar más tarde</Text>
         </TouchableOpacity>
       </ScrollView>
@@ -303,45 +341,39 @@ export default function PatientTransferScreen() {
   );
 }
 
+// ──────────────────────────────────────────────────────────────────────────────
+
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#f5f5f5'
-  },
-  mainContent: {
-    padding: 20,
-    alignItems: 'center'
-  },
+  container: { flex: 1, backgroundColor: '#f5f5f5' },
+  mainContent: { padding: 20, alignItems: 'center' },
   title: { fontSize: 24, fontWeight: 'bold', marginBottom: 10 },
   subtitle: { fontSize: 18, fontWeight: '600', color: '#555', marginBottom: 20 },
   image: { width: 100, height: 100, marginBottom: 20, borderRadius: 8 },
   loremContainer: {
-    width: '100%',
-    height: 150,
-    backgroundColor: '#ddda',
-    borderRadius: 8,
-    justifyContent: 'center',
-    padding: 10,
-    marginBottom: 20
+    width: '100%', height: 150, backgroundColor: '#ddda',
+    borderRadius: 8, justifyContent: 'center', padding: 10, marginBottom: 20,
   },
   loremText: { fontSize: 14, color: '#666', textAlign: 'justify' },
-  sectionSubtitle: { fontSize: 16, fontWeight: '600', color: '#444', alignSelf: 'flex-start', marginTop: 20 },
-  signature: { flexDirection: 'row', justifyContent: 'space-between', width: '100%', marginTop: 10 },
-  signatureInput: { width: '75%' },
-  signatureButton: { width: '20%' },
-  saveButton: {
-    backgroundColor: '#28a745',
-    padding: 12,
-    borderRadius: 8,
-    width: '100%',
-    marginTop: 20
+  sectionSubtitle: {
+    fontSize: 16, fontWeight: '600', color: '#444',
+    alignSelf: 'flex-start', marginTop: 20,
   },
-  pendingButton: {
-    backgroundColor: '#6c757d',
-    padding: 12,
-    borderRadius: 8,
-    width: '100%',
-    marginTop: 10
-  },
-  buttonText: { color: 'white', textAlign: 'center', fontWeight: 'bold' }
+
+  row: {
+  flexDirection: 'row',
+  justifyContent: 'space-between',
+  alignItems: 'center',  
+  width: '100%',
+  marginTop: 10,
+},
+  flex75: { width: '75%' },
+  flex20: { width: '20%', alignItems: 'center', alignSelf: 'center' } ,
+
+  signBtn: { backgroundColor: '#20b2aa', paddingVertical: 12, paddingHorizontal: 8, borderRadius: 8, alignItems: 'center' },
+  signBtnTxt: { color: '#fff', fontWeight: '600' },
+  signedTxt: { marginTop: 6, color: '#2f855a', fontWeight: '600' },
+
+  saveButton: { backgroundColor: '#28a745', padding: 12, borderRadius: 8, width: '100%', marginTop: 20 },
+  pendingButton: { backgroundColor: '#6c757d', padding: 12, borderRadius: 8, width: '100%', marginTop: 10 },
+  buttonText: { color: 'white', textAlign: 'center', fontWeight: 'bold' },
 });

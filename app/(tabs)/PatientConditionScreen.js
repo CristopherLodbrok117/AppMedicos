@@ -20,7 +20,7 @@ import {
   updatePatientCondition,
   updateRecord,
   getPatientConditionById,
-  getRecordById,            // ← para leer status y bloquear edición
+  getRecordById,            //  para leer status y bloquear edición
   getSessionRecordId,
   setSessionRecordId
 } from '../../services/database';
